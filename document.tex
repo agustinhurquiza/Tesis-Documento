@@ -1,0 +1,185 @@
+%Plantilla basada en "Template for Masters / Doctoral Thesis" (plantilla disponible en writeLaTex) que subió LaTeXTemplates.com
+
+\documentclass[12pt,twosided]{book}
+\usepackage[paperwidth=17cm, paperheight=22.5cm, bottom=2.5cm, right=2.5cm]{geometry}
+\usepackage{amssymb,amsmath,amsthm} %paquete para símbolo matemáticos
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc} %Paquete para escribir acentos y otros símbolos directamente
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+%\usepackage{subfig} %para poner subfiguras
+\graphicspath{{Img/}} %En qué carpeta están las imágenes
+\usepackage[square,sort,comma,numbers]{natbib}
+
+\usepackage[nottoc]{tocbibind}
+\usepackage[pdftex,
+            pdfauthor={Agustin Horacio Urquiza Toledo},
+            pdftitle={Zero-Shot Object Detection},
+            pdfsubject={Ciencias de la computación},
+            pdfkeywords={PALABRAS CLAVE},
+            pdfproducer={Latex con hyperref},
+            pdfcreator={pdflatex}]{hyperref}
+
+\usepackage[colorinlistoftodos]{todonotes}
+\newcommand{\todos}[1]{{\color{red}[TODO: #1]}}
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	COMANDOS PERSONALIZADOS
+%----------------------------------------------------------------------------------------
+
+%SI TU TESIS TIENE TEOREMAS Y DEMOSTRACIONES, PUEDES DESCOMENTAR Y USAR LOS SIGUIENTES COMANDOS
+
+%\renewcommand{\proofname}{Demostración}
+%\providecommand{\norm}[1]{\lVert#1\rVert} %Provee el comando para producir una norma.
+%\providecommand{\innp}[1]{\langle#1\rangle} 
+%\newcommand{\seno}{\mathrm{sen}}
+%\newcommand{\diff}{\mathrm{d}}
+
+%\newtheorem{teo}{Teorema}[section] 
+%\newtheorem{cor}[teo]{Corolario}
+%\newtheorem{lem}[teo]{Lema}
+
+%\theoremstyle{definition}
+%\newtheorem{dfn}[teo]{Definición}
+
+%\theoremstyle{remark}
+%\newtheorem{obs}[teo]{Observación}
+
+%\allowdisplaybreaks
+
+
+%----------------------------------------------------------------------------------------
+%	PORTADA
+%----------------------------------------------------------------------------------------
+
+\title{Framework para aprendizaje activo} %Con este nombre se guardará el proyecto en writeLaTex
+
+\begin{titlepage}
+\begin{center}
+
+\textsc{\Large Facultad de Matemática, Astronomía, Física y Computación}\\[2em]
+
+\textsc{Universidad Nacional de Córdoba}
+
+%Figura
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.2]{img/unc.jpg}
+\end{center}
+\end{figure}
+
+\vspace{1em}
+
+\textsc{\huge \textbf{Zero-Shot Object Detection}}\\[2em]
+
+\textsc{\large Tesis}\\[1em]
+
+\textsc{que para obtener el título de}\\[1em]
+
+\textsc{Licenciado en Ciencias de la Computación}\\[1em]
+
+\textsc{presenta}\\[1em]
+
+\textsc{\Large Agustin Horacio Urquiza Toledo}\\[1em]
+
+\textsc{\large Director: Jorge Sanchez}
+
+\end{center}
+
+\vspace*{\fill}
+\textsc{Córdoba, Argentina \hspace*{\fill} 2019}
+
+\end{titlepage}
+
+
+%----------------------------------------------------------------------------------------
+%	DEDICATORIA
+%----------------------------------------------------------------------------------------
+
+\pagestyle{empty}
+\frontmatter
+
+\chapter*{}
+\begin{flushright}
+\textit{DEDICATORIA}
+\end{flushright}
+
+
+%----------------------------------------------------------------------------------------
+%	AGRADECIMIENTOS
+%----------------------------------------------------------------------------------------
+
+\chapter*{Agradecimientos}
+%\markboth{AGRADECIMIENTOS23}{AGRADECIMIENTOS} % encabezado 
+
+
+
+
+%----------------------------------------------------------------------------------------
+%	PREFACIO
+%----------------------------------------------------------------------------------------
+
+\chapter*{Resumen}
+
+\pagestyle{plain}
+Pasado el año 2000 se dan dos hechos que harán que las imágenes en Internet de un gran salto. Por un lado se empiezan a popularizar las cámaras digitales y por otro lado las conexiones de Internet subieron su velocidad. Esto genero la necesidad de crear métodos veloces y eficaces que faciliten la extracción de información en este tipo de datos. Luego, a partir del año 2010 con la  ``Revolución'' del Aprendizaje profundo, surgieron una gran cantidad de métodos para realizar esta tarea, entre ellos los Detectores. Pero esto genero la necesidad de tener una gran cantidad de imágenes anotadas, que en algunos casos no resulta viable. \textbf{Zero-shot Object Detection} intenta atacar este problema. En esta tesis estudiaremos, analizaremos y probaremos este método.
+%----------------------------------------------------------------------------------------
+%	TABLA DE CONTENIDOS
+%---------------------------------------------------------------------------------------
+
+\begingroup
+\hypersetup{hidelinks}
+\tableofcontents
+\endgroup
+
+
+%----------------------------------------------------------------------------------------
+%	TESIS
+%----------------------------------------------------------------------------------------
+\mainmatter %empieza la numeración de las páginas
+\pagestyle{headings}
+
+%  Incluye los capítulos en el folder de capítulos
+
+\include{Capitulos/intro}
+
+\include{Capitulos/definicion}
+
+\include{Capitulos/arquitectura}
+
+\include{Capitulos/experimentos}
+
+\include{Capitulos/Conclusiones}
+
+\thispagestyle{empty}
+
+%----------------------------------------------------------------------------------------
+%	APÉNDICES
+%----------------------------------------------------------------------------------------
+
+% \addtocontents{toc}{\vspace{2em}} % Agrega espacios en la toc
+
+% \appendix % Los siguientes capítulos son apéndices
+
+%  Incluye los apéndices en el folder de apéndices
+
+% \include{Apendices/Ap}
+% \thispagestyle{empty}
+%\include{Apendices/AppendixB}
+%\include{Apendices/AppendixC}
+
+\addtocontents{toc}{\vspace{2em}} % Agrega espacio en la toc
+
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAFÍA
+%----------------------------------------------------------------------------------------
+\backmatter
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{bibliografia.bib} %Aquí ponen el nombre del archivo .bib
+
+\end{document}
