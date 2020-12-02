@@ -42,6 +42,37 @@ En problemas de detección de objetos, generalmente tenemos que encontrar todos 
 
 \section{Multimodales}
 
-Nuestra experiencia del mundo es multimodal, vemos objetos, escuchamos sonidos, sentimos la textura, olemos los olores y probamos los sabores. La modalidad se refiere a la forma en que algo sucede o se experimenta y un problema de investigación se caracteriza como multimodal cuando incluye múltiples modalidades. Para que la inteligencia artificial avance en la comprensión del mundo que nos rodea, necesita poder interpretar y relacionar estas señales multimodales. Aunque la combinación de diferentes modalidades o tipos de información para mejorar el rendimiento parece una tarea intuitivamente atractiva, en la práctica, es un desafío combinar el nivel variable de ruido y los conflictos entre las modalidades. Además, las modalidades tienen una influencia cuantitativa diferente sobre el resultado de la predicción. La idea general es, partir de dos objetos matemáticos distintos uno de cada modal y poder transformar a ambos para lograr que pertenezcan a un tercer objeto que es la representación multimodal. Las imágenes suelen estar asociadas con etiquetas y explicaciones de texto. En este trabajo nos aprovechamos esto y tratamos de encontrar un espacio comun entre el vector que representan a la imagen del objeto y el que representa la sintaxis del mismo.
+Nuestra experiencia del mundo es multimodal, vemos objetos, escuchamos sonidos, sentimos la textura, olemos los olores y probamos los sabores. La modalidad se refiere a la forma en que algo sucede o se experimenta y un problema de investigación se caracteriza como multimodal cuando incluye múltiples modalidades. Para que la inteligencia artificial avance en la comprensión del mundo que nos rodea, necesita poder interpretar y relacionar estas señales multimodales. Aunque la combinación de diferentes modalidades o tipos de información para mejorar el rendimiento parece una tarea intuitivamente atractiva, en la práctica, es un desafío combinar el nivel variable de ruido y los conflictos entre las modalidades. Además, las modalidades tienen una influencia cuantitativa diferente sobre el resultado de la predicción. La idea general es, partir de dos objetos matemáticos distintos uno de cada modal y poder transformar a ambos para lograr que pertenezcan a un tercer objeto que es la representación multimodal. Las imágenes suelen estar asociadas con etiquetas y explicaciones de texto. En este trabajo nos aprovechamos esto y tratamos de encontrar un espacio común entre el vector que representan a la imagen del objeto y el que representa la sintaxis del mismo.
+
+
+\section {Aprendizaje por disparo cero (ZSL)}
+Es una conjunto de problemas de aprendizaje automático, donde en el momento de la prueba, se observan muestras de clases que no se observaron durante el entrenamiento y se necesita predecir la categoría a la que pertenecen. A diferencia de las configuraciones estándares en el aprendizaje automático, donde se espera que se clasifiquen correctamente las nuevas muestras en las clases que ya han observado durante el entrenamiento, en ZSL, no se han proporcionado muestras de las clases durante el entrenamiento del clasificador.
+
+El problema de aprendizaje zero-shot se puede dividir en categorías según los datos presentes durante la fase de entrenamiento y la fase de prueba.\\
+\textbf{Con base en los datos disponibles en el momento de entrenar un modelo}
+\begin{itemize}
+	\item \textbf{Aprendizaje zero-shot inductivo:} Se tiene acceso a datos de imágenes etiquetadas de las clases vistas.
+	\item \textbf{Aprendizaje zero-shot transductivo:} Además de los datos de imagen etiquetados de las clases vistas, también se tiene acceso a las imágenes no etiquetadas de las clases no vistas.
+\end{itemize}
+\textbf{Basado en los datos disponibles en el momento de la inferencia}
+\begin{itemize}
+	\item \textbf{Aprendizaje zero-shot convencional (ZSL):} En las pruebas solo se evalúan las clases no vistas.
+	\item \textbf{Aprendizaje zero-shot generalizado (GZSL):} En las pruebas se evalúan tanto las clases vista como las no vistas.
+\end{itemize}
+
 \section {Detección de objeto por disparo cero (ZSD)}
-%\cite{iacobacci}
+La Detección de objeto por disparo cero (ZSD), tiene como objetivo reconocer y localizar simultáneamente instancias de objetos que pertenecen a categorías novedosas sin ningún ejemplo de entrenamiento. Bajo la clasificación anterior es un modelo inductivo. Como estas categorías no están presente en entrenamiento resulta imposible, tener alguna información sobre su aspecto visual, lo cual no nos permite detectarlas ni reconocerlas. Es necesario encontrar algún dominio que tenga la capacidad de guardar la información de todas las clases, para luego relacionarlas con el aspecto visual de las categorías novedosas. El mas utilizado es el espacio semantico.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/diseno_alto_nievel.png}
+	\caption{Paso a paso, como se modifica la imagen para obtener las perdiciones de clases.}
+	\label{fig:arqutectura}
+\end{figure}
+Para formalizar todo lo dicho, denotamos las clases como $\mathcal{C} = \mathcal{S} \cup \mathcal{U}$, donde $\mathcal{S}$ son las clases vistas para entrenamiento y $\mathcal{U}$ las clases no vistas, utilizadas en la etapa de pruebas. Aunque no es necesario definir el conjunto de clases de pruebas, ya que el modelo tiene que ser capas de detectar tanto clases vista como las no vista, se hace para poder tener una evaluación cuantitativa.\\
+Denotamos a una imagen como $\mathcal{I} \in \mathbb{D}^{\mathcal{M} \times \mathcal{N} \times 3}$. Donde $\mathbb{D} = \{0,...,255\}$, $\mathcal{M}$  es el largo de la imagen, $\mathcal{N}$ el ancho. Esta es la forma en la que se representa una imagen en el formato \textbf{RGB}, uno de los mas utilizado. Por cada imagen se provee un conjunto de cuadros delimitadores  $\mathbb{B} = \{b_0,...,b_k\mid b_i \in N^4\}$ y sus etiquetas asociadas como $\mathbb{Y} = \{y_0,...,y_k\mid y_i \in \mathcal{S}\}$. Para cada cuadro delimitador $b_i$ extraemos una característica profunda utilizando una red neuronal convolucional denotada como $\phi(b_i) \in \mathbb{R}^{D_1}$. Denotamos las incrustaciones semánticas $w_j \in  \mathbb{R}^{D_2}$ obtenido por algun modelo de \textbf{Word embedding}. El objetivo es encontrar una matriz de proyección $W_p$ \[ \psi_i = W_p\phi(b_i) \:\:\:\mid\:\:\: W_P \in \mathbb{R}^{D_2 \times D_1},\:\:\: \psi_i \in \mathbb{R}^{D_2} \] Notar que $\psi_i$ y las incrustaciones semánticas se encuentran en el mismo dominio. Como mencionamos en secciones anteriores se tiene una gran capacidad de capturar similitudes semántica. Por lo cual resulta clave encontrar una matriz que para cada cuadro delimitador se proyecte lo mas cerca posible a la incrustación semántica de su clase.
+
+
+
+
+
+
