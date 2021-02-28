@@ -8,11 +8,11 @@
 \usepackage{enumerate}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{multirow}
 \usepackage{float}
 \usepackage{tikz-qtree,tikz-qtree-compat}
 \usepackage{multicol}
 \usepackage{algpseudocode}
-%\usepackage{subfig} %para poner subfiguras
 \graphicspath{{Img/}} %En qué carpeta están las imágenes
 \usepackage[square,sort,comma,numbers]{natbib}
 
@@ -32,33 +32,12 @@
 %----------------------------------------------------------------------------------------
 %	COMANDOS PERSONALIZADOS
 %----------------------------------------------------------------------------------------
-
-%SI TU TESIS TIENE TEOREMAS Y DEMOSTRACIONES, PUEDES DESCOMENTAR Y USAR LOS SIGUIENTES COMANDOS
-
-%\renewcommand{\proofname}{Demostración}
-%\providecommand{\norm}[1]{\lVert#1\rVert} %Provee el comando para producir una norma.
-%\providecommand{\innp}[1]{\langle#1\rangle} 
-%\newcommand{\seno}{\mathrm{sen}}
-%\newcommand{\diff}{\mathrm{d}}
-
-%\newtheorem{teo}{Teorema}[section] 
-%\newtheorem{cor}[teo]{Corolario}
-%\newtheorem{lem}[teo]{Lema}
-
-%\theoremstyle{definition}
-%\newtheorem{dfn}[teo]{Definición}
-
-%\theoremstyle{remark}
-%\newtheorem{obs}[teo]{Observación}
-
-%\allowdisplaybreaks
-
+\newcommand{\etal}{\textit{et al}.}
 
 %----------------------------------------------------------------------------------------
 %	PORTADA
 %----------------------------------------------------------------------------------------
-
-\title{Framework para aprendizaje activo} %Con este nombre se guardará el proyecto en writeLaTex
+\title{Zero-Shot Object Detection} %Con este nombre se guardará el proyecto en writeLaTex
 
 \begin{titlepage}
 \begin{center}
@@ -93,51 +72,49 @@
 \end{center}
 
 \vspace*{\fill}
-\textsc{Córdoba, Argentina \hspace*{\fill} 2019}
+\textsc{Córdoba, Argentina \hspace*{\fill} 2021}
 
 \end{titlepage}
-
 
 %----------------------------------------------------------------------------------------
 %	DEDICATORIA
 %----------------------------------------------------------------------------------------
-
 \pagestyle{empty}
 \frontmatter
 
-\chapter*{}
 \begin{flushright}
 \textit{DEDICATORIA}
 \end{flushright}
 
-
 %----------------------------------------------------------------------------------------
 %	AGRADECIMIENTOS
+
 %----------------------------------------------------------------------------------------
-
 \chapter*{Agradecimientos}
-%\markboth{AGRADECIMIENTOS23}{AGRADECIMIENTOS} % encabezado 
-Muchas gracias, Muchas gracias, Muchas gracias, Muchas gracias,Muchas gracias,Muchas gracias, Muchas gracias. Son muchas gracias?
-
-
+A la Universidad Nacional de Córdoba por haberme dado la
+oportunidad de formarme. Quiero agradecer a mi tutor Dr. Jorge Sanchez, que me guió y me enseñó lo necesario para realizar este trabajo. A mi familia, y en especial a mis padres, Graciela Toledo y Horacio Urquiza, quienes sin entender del todo lo que hago están siempre apoyandome. A mis compañeros de la licenciatura, que crecí junto a ellos no sólo en lo profesional sino también en lo personal. Y por ultimo a mis amigos de la vida, que siempre me escucharon y me ayudaron a despejarme de tanto estudio.
 
 %----------------------------------------------------------------------------------------
 %	PREFACIO
 %----------------------------------------------------------------------------------------
-
 \chapter*{Resumen}
 
 \pagestyle{plain}
-Pasado el año 2000 se dan dos hechos que harán que las imágenes en Internet de un gran salto. Por un lado se empiezan a popularizar las cámaras digitales y por otro lado las conexiones de Internet subieron su velocidad. Esto genero la necesidad de crear métodos veloces y eficaces que faciliten la extracción de información en este tipo de datos. Luego, a partir del año 2010 con la  ``Revolución'' del Aprendizaje profundo, surgieron una gran cantidad de métodos para realizar esta tarea, entre ellos los Detectores. Pero esto genero la necesidad de tener una gran cantidad de imágenes anotadas, que en algunos casos no resulta viable. \textbf{Zero-shot Object Detection} intenta atacar este problema. En este artículo, abordamos este desafiante problema utilizando características visuales y descripciones semánticas, que tiene como objetivo detectar y reconocer simultáneamente instancias de conceptos novedosos. Para esto analizamos distintos trabajos y llevaremos a cabo experimentos, que aportaran una noción del estado actual de esta area.
+Pasado el año 2000 ocurrieron dos hechos que produjeron que las imágenes en Internet dieran un gran salto, por un lado, se empezaron a popularizar las cámaras digitales, y por otro, las conexiones de Internet subieron su velocidad. Esto generó la necesidad de crear métodos veloces y eficaces que faciliten la extracción de información en este tipo de datos. Luego, a partir del año 2010 con la  ``Revolución'' del Aprendizaje profundo, surgieron una gran cantidad de métodos para realizar esta tarea, entre ellos los Detectores. Estos algoritmos necesitan tener una gran cantidad de imágenes anotadas que en algunos casos resulta inviable. Para resolver este problema surgieron técnicas como \textbf{Zero-shot Object Detection}. 
+
+Este trabajo final abordó este desafiante problema utilizando características visuales y descripciones semánticas, con el objetivo de detectar y reconocer simultáneamente instancias de objetos novedosos. Para esto, analizamos distintos trabajos y llevamos a cabo experimentos que aportan una noción del estado actual en esta área. \\\\\\\\\\\\\\\\\\
+{\huge\textbf{Summary}}\\\\
+
+/*TODO: TRADUCIR*/
+Pasado el año 2000 se dan dos hechos que harán que las imágenes en Internet de un gran salto. Por un lado se empiezan a popularizar las cámaras digitales y por otro lado las conexiones de Internet subieron su velocidad. Esto genero la necesidad de crear métodos veloces y eficaces que faciliten la extracción de información en este tipo de datos. Luego, a partir del año 2010 con la  ``Revolución'' del Aprendizaje profundo, surgieron una gran cantidad de métodos para realizar esta tarea, entre ellos los Detectores. Pero esto genero la necesidad de tener una gran cantidad de imágenes anotadas, que en algunos casos no resulta viable. \textbf{Zero-shot Object Detection} intenta atacar este problema. En este artículo, abordamos este desafiante problema utilizando características visuales y descripciones semánticas, que tiene como objetivo detectar y reconocer simultáneamente instancias de conceptos novedosos. Para esto analizamos distintos trabajos y llevaremos a cabo experimentos, que aportaran una noción del estado actual de esta área
+
 %----------------------------------------------------------------------------------------
 %	TABLA DE CONTENIDOS
 %---------------------------------------------------------------------------------------
-
 \begingroup
 \hypersetup{hidelinks}
 \tableofcontents
 \endgroup
-
 
 %----------------------------------------------------------------------------------------
 %	TESIS
@@ -149,35 +126,15 @@ Pasado el año 2000 se dan dos hechos que harán que las imágenes en Internet d
 
 \include{Capitulos/intro}
 
-\include{Capitulos/definicion}
+\include{Capitulos/preliminares}
 
-\include{Capitulos/arquitectura}
-
-\include{Capitulos/experimentos}
+\include{Capitulos/metodologia}
 
 \include{Capitulos/analisis_resultados}
 
 \include{Capitulos/Conclusiones}
 
 \thispagestyle{empty}
-
-%----------------------------------------------------------------------------------------
-%	APÉNDICES
-%----------------------------------------------------------------------------------------
-
-% \addtocontents{toc}{\vspace{2em}} % Agrega espacios en la toc
-
-% \appendix % Los siguientes capítulos son apéndices
-
-%  Incluye los apéndices en el folder de apéndices
-
-% \include{Apendices/Ap}
-% \thispagestyle{empty}
-%\include{Apendices/AppendixB}
-%\include{Apendices/AppendixC}
-
-\addtocontents{toc}{\vspace{2em}} % Agrega espacio en la toc
-
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAFÍA
