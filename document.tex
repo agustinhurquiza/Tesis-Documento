@@ -13,9 +13,6 @@
 \usepackage{tikz-qtree,tikz-qtree-compat}
 \usepackage{multicol}
 \usepackage{algpseudocode}
-\graphicspath{{Img/}} %En qué carpeta están las imágenes
-\usepackage[square,sort,comma,numbers]{natbib}
-
 \usepackage[nottoc]{tocbibind}
 \usepackage[pdftex,
             pdfauthor={Agustin Horacio Urquiza Toledo},
@@ -26,13 +23,18 @@
             pdfcreator={pdflatex}]{hyperref}
 
 \usepackage[colorinlistoftodos]{todonotes}
-\newcommand{\todos}[1]{{\color{red}[TODO: #1]}}
+\usepackage[square,sort,comma,numbers]{natbib}
+
+%\hypersetup{pdfborder = {0 0 0}}
+\graphicspath{{img/}} %En qué carpeta están las imágenes
+
 \begin{document}
 
 %----------------------------------------------------------------------------------------
 %	COMANDOS PERSONALIZADOS
 %----------------------------------------------------------------------------------------
 \newcommand{\etal}{\textit{et al}.}
+\newcommand{\todos}[1]{{\color{red}[TODO: #1]}}
 
 %----------------------------------------------------------------------------------------
 %	PORTADA
@@ -105,8 +107,9 @@ Pasado el año 2000 ocurrieron dos hechos que produjeron que las imágenes en In
 Este trabajo final abordó este desafiante problema utilizando características visuales y descripciones semánticas, con el objetivo de detectar y reconocer simultáneamente instancias de objetos novedosos. Para esto, analizamos distintos trabajos y llevamos a cabo experimentos que aportan una noción del estado actual en esta área. \\\\\\\\\\\\\\\\\\
 {\huge\textbf{Summary}}\\\\
 
-/*TODO: TRADUCIR*/
-Pasado el año 2000 se dan dos hechos que harán que las imágenes en Internet de un gran salto. Por un lado se empiezan a popularizar las cámaras digitales y por otro lado las conexiones de Internet subieron su velocidad. Esto genero la necesidad de crear métodos veloces y eficaces que faciliten la extracción de información en este tipo de datos. Luego, a partir del año 2010 con la  ``Revolución'' del Aprendizaje profundo, surgieron una gran cantidad de métodos para realizar esta tarea, entre ellos los Detectores. Pero esto genero la necesidad de tener una gran cantidad de imágenes anotadas, que en algunos casos no resulta viable. \textbf{Zero-shot Object Detection} intenta atacar este problema. En este artículo, abordamos este desafiante problema utilizando características visuales y descripciones semánticas, que tiene como objetivo detectar y reconocer simultáneamente instancias de conceptos novedosos. Para esto analizamos distintos trabajos y llevaremos a cabo experimentos, que aportaran una noción del estado actual de esta área
+In the 2000s, the popularization of digital cameras and the increase of the Internet speed caused the rapid development of Internet images. This fact created the need of developing faster and more efficient methods to facilitate the extraction of information from these data. In 2010, with the Deep Learning "revolution", many different methods emerged to carry out this task, among them Detectors. These algorithms use a large number of image annotations that, in some cases, results impossible to obtain. As an alternative to solve this problem, techniques such as \textbf{Zero-shot Object Detection} emerged. 
+
+This thesis tackles this problem using deep features and semantic embedding, with the aim of detecting and recognizing novel object instances. Hence, we analyzed different works from literature and we performed experiments that provide a notion of the current state in this area.
 
 %----------------------------------------------------------------------------------------
 %	TABLA DE CONTENIDOS

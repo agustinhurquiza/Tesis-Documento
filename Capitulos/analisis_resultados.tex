@@ -1,28 +1,30 @@
 \chapter{Análisis de resultados} \label{cap:analisideresultado}
-En este capitulo se analizaran los distintos resultados obtenidos por nosotros en los experimentos detallados en el capitulo \ref{cap:experimentos}, se comparan con los de Bansal y se analiza el por que de las diferencias obtenidas.
+
+En este capitulo se analizan los distintos resultados obtenidos en nuestros experimentos, detallados en la \autoref{cap:experimentos}, se comparan con los de Bansal \etal~\cite{bansal2018zero} y se explican las diferencias obtenidas.
+
 \section{Resultados cuantitativos} \label{sec:resultadoscuantitativos}
 
-Esta sección desarrolla de una forma numérica los resultados obtenidos por los distintos modelos y en las distintas métricas definidas en el capitulo anterior. Desde que se empezó con este trabajo, se presentaros varios documentos sobre ZSD, resulto indispensable comparar con un trabajo mas actual. El motivo de esto es solo ilustrar la evolución que obtuvo ZSD en los últimos años.\\
+Esta sección desarrolla de forma numérica los resultados obtenidos por los distintos modelos y en las distintas métricas. Desde que se empezó con este trabajo, se publicaron varios artículos sobre ZSD, por lo cual resulta interesante comparar con un trabajo mas actual, y así ilustrar la evolución que obtuvo ZSD en los últimos años.\\\\
 
 \begin{table}[]
 	\centering
 	\resizebox{12.5cm}{1cm} {
 		\begin{tabular}{|l|c|c|c|c|c|}
 			\hline
-			\multicolumn{1}{|c|}{\textbf{Metrica}} & \textbf{Baseline Bansal} & \multicolumn{1}{l|}{\textbf{Mejor resultado Bansal}} & \textbf{Nuestros con VGG} & \textbf{Nuestros con ResNet} & \multicolumn{1}{l|}{\textbf{Mejor  resultado de \cite{rahman2020zero}}} \\ \hline
+			\multicolumn{1}{|c|}{\textbf{Metrica}} & \textbf{Baseline \cite{bansal2018zero}} & \multicolumn{1}{l|}{\textbf{DSES \cite{bansal2018zero}}} & \textbf{Nuestros con VGG} & \textbf{Nuestros con ResNet} & \multicolumn{1}{l|}{\textbf{Mejor  resultado de \cite{rahman2020zero}}} \\ \hline
 			\textbf{100@Recall (Bansal)}           & 22.14                    & 27.19                                                & 26.34                     & 28.91                        & -                                                                      \\ \hline
 			\textbf{100@Recall}                    & -                        & -                                                    & 2.72                      & 4.26                         & 12.27                                                                  \\ \hline
 			\textbf{mAP@0.5}                       & 0.32                     & 0.54                                                 & 0.19                     & 0.23                        & 5.05                                                                   \\ \hline
 			\textbf{mAP@[.5, .95]}                 & -                        & -                                                    & 0.17                     & 0.21                        & -                                                                      \\ \hline
 		\end{tabular}
 	}
-	\caption{Resutados obtenidos por Bansal  \cite{bansal2018zero}, nosotros y Rahman \cite{rahman2020zero}.}
+	\caption{Resutados obtenidos por Bansal \etal~\cite{bansal2018zero}, nosotros y Rahman \etal~\cite{padilla2020survey}.}
 	\label{tab:resultadosZSD}
 \end{table}
 
-El Cuadro \ref{tab:resultadosZSD}, muestra los valores de las métricas 100@Recall, en la versión desarrollada por Bansal y la de Padilla, tambien se muestran los resultados para mAP@0.5 y mAP[.5, .95]. Se analizan 2 modelos propuestos por nosotros utilizando \textbf{VGG16} y \textbf{Inception ResNet V2} y el mejor resultado presentado por el trabajo de Rahman Shafin \cite{rahman2020zero}. Se eligió este documento ya que aborda de una manera similar el problema de ZSD. Pero presenta algunas mejoras y un modelo mas complejo.\\
+La \autoref{tab:resultadosZSD}, muestra los valores de las métricas \textit{100@Recall}, en la versión desarrollada por Bansal  \etal~\cite{bansal2018zero} y la de Padilla \etal~\cite{padilla2020survey}, también se muestran los resultados para \textit{mAP@0.5} y \textit{ mAP[.5, .95]}. Se analizan 2 modelos propuestos por nosotros utilizando \textit{VGG16} y \textit{Inception ResNet V2} y el mejor resultado presentado por el trabajo de Rahman \etal~\cite{rahman2020zero}. Se eligió este documento ya que aborda de una manera similar a la nuestra el problema de ZSD, aunque presenta algunas mejoras y un modelo mas complejo.\\
 
-El mejor resultado de Bansal el cual denomina \textit{Densely Sampled Embedding Space} \textbf{DSES} consiste en aumentar el procedimiento de entrenamiento con datos adicionales de fuentes externas que contienen casillas que pertenecen a clases distintas de las clases invisibles. Obtiene 27.19 puntos, el cual nuestro baseline iguala e incluso supera con 26.34 con \textbf{VGG} y 28.91 usando \textbf{ResNet}. El motivo de esto, se debe a que en un principio se calculaba 100@Recall, con una implementación distinta de Bansal. Al no poder igualar sus resultados, se experimento mucho con los distintos parámetros de cada etapa. Luego al calcular con una implementación como define Bansal, esta experimentación resulta en una pequeña mejora en el baseline.
+El mejor resultado de Bansal el cual denomina \textit{Densely Sampled Embedding Space (DSES)} consiste en aumentar el procedimiento de entrenamiento con datos adicionales de fuentes externas que contienen casillas que pertenecen a clases distintas a las clases invisibles. Obtiene 27.19 puntos, el cual nuestro baseline iguala e incluso supera con 26.34 con \textbf{VGG} y 28.91 usando \textbf{ResNet}. El motivo de esto, se debe a que en un principio se calculaba 100@Recall, con una implementación distinta de Bansal. Al no poder igualar sus resultados, se experimento mucho con los distintos parámetros de cada etapa. Luego al calcular con una implementación como define Bansal, esta experimentación resulta en una pequeña mejora en el baseline.
 
 En cuanto mAP, Bansal no aporta mucha información solo reporta los valores para COCO. La implementación es desconocida, por lo cual asumimos que lo reportado es mAP@0.5. De inmediato se puede observar que los valores son muy bajos 0.54. Aunque nosotros obtuvimos resultados aun mas bajos, con un máximo de 0.23 puntos. La justificación de esta diferencia es, que Bansal solo tiene en cuenta aquellos cuadros verdaderos que tienen un IOU $> 0.5$ con alguna propuesta. Pero nosotros utilizamos todos los cuadros verdaderos, independientemente si se detectaron o no. 
 	
@@ -62,3 +64,21 @@ Estos resultados fueron, calculados sobre la división de clases propuesta por B
 \section{Resultados cualitativos} \label{sec:resultadoscualitativos}
 
 La Figura [N] muestra las detecciones del modelo propuesto en el conjunto de datos MSCOCO. Los cuadros azules muestran detecciones correctas y los cuadros rojos muestran falsos positivos. Estos ejemplos confirman que los modelos propuestos son capaces de detectar clases invisibles sin observar ninguna muestra durante el entrenamiento. Para estas pruebas se reduzco el numero de propuestas al orden de 10.
+
+\begin{figure}[]
+	\begin{subfigure}{.48\textwidth}
+		\includegraphics[width=1\textwidth]{ejemplo1.jpg}
+	\end{subfigure}
+	\begin{subfigure}{.48\textwidth}
+		\includegraphics[width=1\textwidth]{ejemplo2.jpg}
+	\end{subfigure}
+	\begin{subfigure}{.45\textwidth}
+		\includegraphics[width=1\textwidth]{ejemplo3.jpg}
+	\end{subfigure}
+	\begin{subfigure}{.45\textwidth}
+		\includegraphics[width=1\textwidth]{ejemplo4.jpg}
+		\includegraphics[width=1\textwidth]{ejemplo5.jpg}
+	\end{subfigure}
+	\caption{ejemplos}
+	\label{fig:Ejmeplos}
+\end{figure}
