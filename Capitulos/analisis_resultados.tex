@@ -4,81 +4,90 @@ En este capitulo se analizan los distintos resultados obtenidos en nuestros expe
 
 \section{Resultados cuantitativos} \label{sec:resultadoscuantitativos}
 
-Esta sección desarrolla de forma numérica los resultados obtenidos por los distintos modelos y en las distintas métricas. Desde que se empezó con este trabajo, se publicaron varios artículos sobre ZSD, por lo cual resulta interesante comparar con un trabajo mas actual, y así ilustrar la evolución que obtuvo ZSD en los últimos años.\\\\
+Esta sección desarrolla de forma numérica los resultados obtenidos por los distintos modelos y en las distintas métricas. Se analizan las configuraciones ZSD Y GZSD.
 
-\begin{table}[]
+\subsection{Resultados ZSD}
+
+\begin{table}[H]
 	\centering
 	\resizebox{12.5cm}{1cm} {
 		\begin{tabular}{|l|c|c|c|c|c|}
 			\hline
 			\multicolumn{1}{|c|}{\textbf{Metrica}} & \textbf{Baseline \cite{bansal2018zero}} & \multicolumn{1}{l|}{\textbf{DSES \cite{bansal2018zero}}} & \textbf{Nuestros con VGG} & \textbf{Nuestros con ResNet} & \multicolumn{1}{l|}{\textbf{Mejor  resultado de \cite{rahman2020zero}}} \\ \hline
-			\textbf{100@Recall (Bansal)}           & 22.14                    & 27.19                                                & 26.34                     & 28.91                        & -                                                                      \\ \hline
-			\textbf{100@Recall}                    & -                        & -                                                    & 2.72                      & 4.26                         & 12.27                                                                  \\ \hline
-			\textbf{mAP@0.5}                       & 0.32                     & 0.54                                                 & 0.19                     & 0.23                        & 5.05                                                                   \\ \hline
-			\textbf{mAP@[.5, .95]}                 & -                        & -                                                    & 0.17                     & 0.21                        & -                                                                      \\ \hline
+			\textbf{100@Recall (Bansal)}           & 22.14                                   & 27.19                                                    & 26.34                     & 28.91                        & -                                                                       \\ \hline
+			\textbf{100@Recall}                    & -                                       & -                                                        & 5.44                      & 6.38                         & 12.27                                                                   \\ \hline
+			\textbf{mAP@0.5}                       & 0.32                                    & 0.54                                                     & 0.19                      & 0.23                         & 5.05                                                                    \\ \hline
+			\textbf{mAP@[.5, .95]}                 & -                                       & -                                                        & 0.17                      & 0.21                         & -                                                                       \\ \hline
 		\end{tabular}
 	}
-	\caption{Resutados obtenidos por Bansal \etal~\cite{bansal2018zero}, nosotros y Rahman \etal~\cite{padilla2020survey}.}
+	\caption{Resutados obtenidos por Bansal \etal~\cite{bansal2018zero}, nosotros y Rahman \etal~\cite{rahman2020zero}. Se presentan las distintas métricas \textit{recall} y \textit{mAP}, evaluados en COCO.}
 	\label{tab:resultadosZSD}
 \end{table}
 
-La \autoref{tab:resultadosZSD}, muestra los valores de las métricas \textit{100@Recall}, en la versión desarrollada por Bansal  \etal~\cite{bansal2018zero} y la de Padilla \etal~\cite{padilla2020survey}, también se muestran los resultados para \textit{mAP@0.5} y \textit{ mAP[.5, .95]}. Se analizan 2 modelos propuestos por nosotros utilizando \textit{VGG16} y \textit{Inception ResNet V2} y el mejor resultado presentado por el trabajo de Rahman \etal~\cite{rahman2020zero}. Se eligió este documento ya que aborda de una manera similar a la nuestra el problema de ZSD, aunque presenta algunas mejoras y un modelo mas complejo.\\
+La idea inicial de esta tesis era replicar el modelo base de Bansal \etal~\cite{bansal2018zero}, una ves logrado esto, modificar nuestra implementación con el objetivo de mejorar los resultados. Pero esta idea se frustro al no obtener valores similares a los reportados. Para encontrar la causa de esta diferencia se necesito depurar cada etapa del código. Luego de confirmar que la implementación no tenia ningún error aparente y replicaba correctamente lo que se define en el trabajo de Bansal \etal~\cite{bansal2018zero}, se comenzó a modificar los distintos parámetros de cada etapa, aun sin éxito se analizaron las métricas y se encontró una diferencia en la definición, lo cual explica la discrepancia en los resultados que analizaremos a continuación.  
 
-El mejor resultado de Bansal el cual denomina \textit{Densely Sampled Embedding Space (DSES)} consiste en aumentar el procedimiento de entrenamiento con datos adicionales de fuentes externas que contienen casillas que pertenecen a clases distintas a las clases invisibles. Obtiene 27.19 puntos, el cual nuestro baseline iguala e incluso supera con 26.34 con \textbf{VGG} y 28.91 usando \textbf{ResNet}. El motivo de esto, se debe a que en un principio se calculaba 100@Recall, con una implementación distinta de Bansal. Al no poder igualar sus resultados, se experimento mucho con los distintos parámetros de cada etapa. Luego al calcular con una implementación como define Bansal, esta experimentación resulta en una pequeña mejora en el baseline.
+La \autoref{tab:resultadosZSD}, muestra los valores de las métricas \textit{100@Recall}, en la versión desarrollada por Bansal \etal~\cite{bansal2018zero} y la de Padilla \etal~\cite{padilla2020survey}, también se muestran los resultados para \textit{mAP@0.5} y \textit{mAP[.5, .95]}. Se observan 2 modelos propuestos por nosotros, uno utilizando \textit{VGG16} y el otro \textit{Inception ResNet V2}, ademas se agregan los mejores resultado presentado por el trabajo de Rahman \etal~\cite{rahman2020zero}. Se eligió este documento ya que es un trabajo mas actual y aborda de una manera similar a la nuestra el problema de ZSD, aunque presenta algunas mejoras y un modelo mas complejo.\\
 
-En cuanto mAP, Bansal no aporta mucha información solo reporta los valores para COCO. La implementación es desconocida, por lo cual asumimos que lo reportado es mAP@0.5. De inmediato se puede observar que los valores son muy bajos 0.54. Aunque nosotros obtuvimos resultados aun mas bajos, con un máximo de 0.23 puntos. La justificación de esta diferencia es, que Bansal solo tiene en cuenta aquellos cuadros verdaderos que tienen un IOU $> 0.5$ con alguna propuesta. Pero nosotros utilizamos todos los cuadros verdaderos, independientemente si se detectaron o no. 
+La \textit{100@Recall} es un buen punto de partida para analizar el modelo propuesto, ya que refleja el numero de propuestas predichas correctamente sobre el total de cuadros verdaderos. Obtuvimos 6.38 puntos en esta métrica, que resulta por debajo de lo esperado. Pero esto no significa necesariamente que el modelo no funciona correctamente, existen varios parámetros que influyen en este resultado. El punto que mas afecta es el generador de propuestas, ya que menos del 50\% de los cudros verdaderos obtienen una propuesta con $IoU > 0.5$ lo cual reduce mucho la esperanza de esta métrica. Otro punto, es la capacidad de la CNN de obtener un espacio de caracteristicas visuales, que agrupe las clases visualmente similares y separe las diferentes. Como se vio en la \autoref{ssec:experimentacionconcnn}, \textit{ResNet} supera a \textit{VGG16} en esta tarea, lo cual se refleja en la pequeña mejora del modelo que utiliza  \textit{ResNet}.
+
+En cuanto a \textit{mAP} obtuvimos 0.23 puntos, esto es un bajo desempeño comparado con los trabajos publicados por la comunidad científica. Pero al igual que \textit{100@Recall} se ve afectada por los puntos antes mencionados, ademas, existe otro que la afecta muy fuertemente. Por la naturaleza de la matriz que proyecta las caracteristicas visuales al espacio semantico, hace que dos objetos proyectados obtengan una similitud coseno poco distanciada, la cual ronda entre los valores 0.3 y 0.6. Es decir que si proyecto dos imágenes con muy pocas diferencias obtendrán un similitud como máximo de 0.6. Esta similitud es utilizada como el puntaje de confianza de una predicción y como se explico en la \autoref{ssec:definiciondemetricas}, \textit{mAP} varia un limite de confianza de predicciones para calcular la curva AUC. Esto hace que para limites superiores a 0.6 se obtengan valores muy bajos o incluso nulos de \textit{precisión}.\\
+ 
+
+En comparacion con el mejor resultado de Bansal \etal~\cite{bansal2018zero} el cual denomina \textit{Densely Sampled Embedding Space (DSES)} y consiste en aumentar el procedimiento de entrenamiento con datos adicionales de fuentes externas que contienen casillas que pertenecen a clases distintas a las clases invisibles. Obtiene 27.19 puntos en su definición de \textit{recall}, el cual nuestro modelo base supera con 28.91 puntos usando \textit{ResNet}. Esto se debe a que en la etapa de depuración se modificaron algunos parapetaros por defecto del entrenamiento, como el numero de lote, la taza de aprendizaje, el optimizador, etc.  
+
+En cuanto mAP, Bansal no aporta mucha información y su implementación es desconocida, por lo cual asumimos que lo reportado es \textit{mAP@0.5}. De inmediato se puede observar que los valores son muy bajos 0.54. Esto genera una discrepancia con su alto rendimiento de \textit{recall} y refleja lo poco representativa de esta ultima métrica. 
+
+Si comparamos con un trabajo mas actual~\cite{rahman2020zero} que obtiene 12.27 en \textit{100@Recall} y un excelente desempeño en \textit{mAP@0.5} con 5.05 puntos, refleja una consistencia con nuestros valores y que la implementación utilizada para calcular las métricas esta mejor encaminada.\\
 	
-Si aislamos nuestros resultados, sabiendo que es solo un baseline y un modelo muy sencillo sin utilizar ningún tipo de información extra, obtuvimos valores aceptables para 100@Recall con 6.26 puntos. Pero resulta importante resaltar su bajo desempeño en mAP. El principal motivo de este resultado es el algoritmo para proponer objetos. Se necesitan muchos cuadros delimitadores y aun así no se alcanza a superponer con la mayoría de cuadros verdaderos.
 
-Comparando con un trabajo mas actual, nuestros resultados son coherentes. Pero claro esta que obtiene valores 3 veces mejores en  100@Recall y un excelente desempeño en mAP con 5.05 puntos.\\
+Estos resultados fueron, calculados sobre la división de clases propuesta por Bansal ya que ambos trabajos con cuales comparamos utilizan esta. Pero también se corrieron las evaluaciones con la partición propuesta en este trabajo. Los resultados se vieron afectados entre un 4\% y 7\% menos al utilizar nuestra división. Esta reducción se debe a que el documento de Bansal \etal~\cite{bansal2018zero} utiliza como criterio de división los vectores semánticos de las clases, esto afecta positivamente ya que es el mismo espacio utilizado para inferir las clases inviables.\\
 
 También se calcularon las métricas para el conjunto de datos CIFAR-ZSD. Pero fueron necesario algunas mejoras para adaptarse a las diferencias con COCO. Primero se utilizo una tamaño de la entrada de la CNN mas pequeña de 32x32. Esto se debe a que las imágenes no tienen una gran resolución. También, se reduzco considerablemente el numero máximo de de propuestas, del orden de 50. La justificación de esto es que los objetos sobresalen del fondo de la imagen y es mas fácil su detección.
 
-Dicho esto, los resultados obtenidos fueron, 7.46 en 100@Recall (implementación de Rafael) y 0.72 para mAP@0.5. Estos valores al contrario de los reportados para COCO, se ven influenciado por la calidad de la imagen, lo que hace muy difícil de diferenciar el aspecto visual de las distintas clases. Pero ayuda a entender como influye en las métricas el generar una cantidad reducida de propuestas y que tengan una porcentaje de superposición alta.\\
+Dicho esto, los resultados obtenidos fueron, 8.83 en \textit{100@Recall} (implementación de Padilla \etal~\cite{padilla2020survey}) y 0.72 para \textit{mAP@0.5}. Estos valores al contrario de los reportados para COCO, se ven influenciado por la calidad de la imagen, lo que hace muy difícil de diferenciar el aspecto visual de las distintas clases.\\
 
-Por ultimo, se analizaron los resultados en el desafió de \textbf{ZSDG}. La configuración generalizada de aprendizaje de disparo cero es más realista que la configuración de disparo cero discutida anteriormente, porque tanto las clases visibles como las invisibles están presentes durante la evaluación.
+En conclusión, sabiendo que es solo un modelo base muy sencillo sin utilizar ningún tipo de información extra, obtuvimos valores aceptables para \textit{100@Recall}, aunque resulta importante resaltar su bajo desempeño en \textit{mAP}. 
 
-El Cuadro \ref{tab:resultados-zsdg}, se muestran los resultados para ZSDG. Bansal solo reporta 100@Recall. Este modifica el método de evaluación, calculando la clase visible e invisible mas probable y si la no vista supera un umbral t, le asigna esa clase caso contrario utiliza la clase vista. Nosotros por otro lado utilizamos el mismo método de evaluacion, lo única diferencia es que se tienen en cuenta todas las clases. Dicho esto, Bansal obtiene un promedio de 15.17 y nosotros obtenemos una mejora de 4 puntos. En cuanto a mAP, conseguimos una media de 0.13.\\
+\subsection{Resultados GZSD}
+Por ultimo, se analizaron los resultados en el desafió de GZSD. La configuración generalizada de aprendizaje de disparo cero es más realista que la configuración de disparo cero discutida anteriormente, porque tanto las clases visibles como las invisibles están presentes durante la evaluación.
 
-Si comparamos los resultados de ZSD vs ZSDG, se observa una baja en las métricas. El motivo es que las clases vistas al estar en entrenamiento, obtienen un mejor puntaje en la etapa de evaluacion que las clases invisibles. Por esto muchos objetos que en la configuración anterior, predecía correctamente ahora una clase visible obtiene mejor puntaje.\\
+La \autoref{tab:resultados-gzsd}, se muestra los resultados para GZSD evaluados en COCO. En esta se puede observar el desempeño obtenido en \textit{100@Recall} y \textit{mAP@0.5}, para las cuales este trabajo obtuvo 3.84 puntos y 0.13 respectivamente en promedio con las clases visibles e invisibles. Como es de esperarse se obtuvo un mejor rendimiento para las clases vistas en ambas métricas.
 
-Estos resultados fueron, calculados sobre la división de clases propuesta por Bansal ya que ambos trabajos con cuales comparamos utilizan esta. Pero también se corrieron las evaluaciones con la partición propuesta en este trabajo. Los resultados finales fue de un 4\% y 7\% menos. Esta reducción se debe a que el documento de Bansal utiliza como criterio de división los vectores semánticos de las clases, esto afecta positivamente ya que es el mismo espacio utilizado para inferir las clases inviables.
+La metodología de evaluacion es la misma que ZSD estándar solo que ahora se agrega las clases visibles a las pruebas. Algunos trabajos modifican la metodología de evaluacion para que las clases inviables tengan mas oportunidad sobre las vistas, pero esto agrega información extra que en situaciones reales no tenemos.\\
+
+Si comparamos los resultados de ZSD vs GZSD, se observa un decremento en los valores de las métricas promedio. Esta disminución también se ve reflejado en los trabajos \cite{bansal2018zero} y \cite{rahman2020zero}. El motivo de esto es que las clases vistas al estar en entrenamiento, tienden a tener un mejor puntaje en la etapa de evaluacion que las clases invisibles perteneciente a su clase superior. Por esto muchos objetos que en la configuración anterior, predecía correctamente ahora una clase visible obtiene mejor puntaje.\\
+
 
 \begin{table}[]
 	\centering
 	\resizebox{12.5cm}{1.2cm} {
 	\begin{tabular}{|l|c|c|c|}
 		\hline
-		\multicolumn{1}{|c|}{\multirow{3}{*}{Modelo}} & \multicolumn{3}{c|}{ZSDG}                                                       \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{\multirow{3}{*}{Modelo}} & \multicolumn{3}{c|}{GZSD}                                                       \\ \cline{2-4} 
 		\multicolumn{1}{|c|}{}                        & Clases vistas             & Clases Invisibles        & Media                    \\ \cline{2-4} 
 		\multicolumn{1}{|c|}{}                        & mAP/Recall Bansal/Recall  & mAP/Recall Bansal/Recall & mAP/Recall Bansal/Recall \\ \hline
-		Bansal                                        & -/15.02/-                 & -/15.32/-                & -/15.17/-                \\ \hline
-		Nuestro Baseline                              & 0.15/20.98/3.36           & 0.11/18.53/2.49          & 0.13/19.75/2.9           \\ \hline
-		Mejor  resultado de \cite{rahman2020zero}     & 13.93/-/20.42             & 2.55/-/12.42             & 4.31/-/15.45             \\ \hline
+		Mejor resultado \cite{bansal2018zero}                                        & -/15.02/-                 & -/15.32/-                & -/15.17/-                \\ \hline
+		Nuestro modelo base                              & 0.15/20.98/4.77           & 0.11/18.53/2.92          & 0.13/19.75/3.84           \\ \hline
+		Mejor resultado de \cite{rahman2020zero}     & 13.93/-/20.42             & 2.55/-/12.42             & 4.31/-/15.45             \\ \hline
 	\end{tabular}
 	}
-	\caption{Resultados obtenidos, en el desafió ZSDG, para los modelos de Bansal \cite{bansal2018zero}, nuestro (ResNet) y Rahman \cite{rahman2020zero}}
-	\label{tab:resultados-zsdg}
+	\caption{Resultados obtenidos, en el desafió GZSD, para los modelos de Bansal \etal~\cite{bansal2018zero}, nuestro (ResNet) y Rahman \etal~\cite{rahman2020zero}}
+	\label{tab:resultados-gzsd}
 \end{table}
+\newpage
 
 \section{Resultados cualitativos} \label{sec:resultadoscualitativos}
 
-La Figura [N] muestra las detecciones del modelo propuesto en el conjunto de datos MSCOCO. Los cuadros azules muestran detecciones correctas y los cuadros rojos muestran falsos positivos. Estos ejemplos confirman que los modelos propuestos son capaces de detectar clases invisibles sin observar ninguna muestra durante el entrenamiento. Para estas pruebas se reduzco el numero de propuestas al orden de 10.
+Para poder tener una idea mas realista del comportamiento del modelo propuesto, se probo sobre algunas imágenes de muestra. Con el objetivo de obtener ejemplos mas claro fue necesario modificar la metodología que se utilizo para calcular los resultados cuantitativos. Para esto, disminuimos el numero de propuestas en el orden de 10 y se descarto todas aquellas que obtuvieron un puntaje de confianza menor a 0.5. Esto hace que los ejemplos solo contengan los objetos mas relevantes, pero una contra de esto es que descarta muchos que están en un segundo plano. Otra aclaración importante es que se evaluá ZSD y no GZSD, es por esto que se ignoran o confunde clases visibles. 
+
+La \autoref{fig:ejmeplosModelo} muestra las detecciones del modelo propuesto en el conjunto de datos COCO. Los cuadros azules muestran detecciones incorrectas y en verdes los que acertaron a la clase que pertenece el objeto. 
+
+Si bien el modelo confunde algunas instancias de objetos, cabe destacar que por lo general se equivoca dentro de una misma clase superior, confirmado que el modelo propuesto es capaz de relacionar aspectos visuales y detectar clases invisibles sin observar ninguna muestra durante el entrenamiento. 
+
+Otro punto es que a pesar de que reducimos la cantidad de propuestas, no están centradas en los objetos y no detectan otros que se encuentran en un primer plano. Ademas con esta configuración resulta difícil encontrar un ejemplo que se observen objetos pequeños como  un ``cuchillo'' ya que las propuestas son a escalas mas grandes y se ven opacadas por los objetos que lo rodean como un ``plato''.
 
 \begin{figure}[]
-	\begin{subfigure}{.48\textwidth}
-		\includegraphics[width=1\textwidth]{ejemplo1.jpg}
-	\end{subfigure}
-	\begin{subfigure}{.48\textwidth}
-		\includegraphics[width=1\textwidth]{ejemplo2.jpg}
-	\end{subfigure}
-	\begin{subfigure}{.45\textwidth}
-		\includegraphics[width=1\textwidth]{ejemplo3.jpg}
-	\end{subfigure}
-	\begin{subfigure}{.45\textwidth}
-		\includegraphics[width=1\textwidth]{ejemplo4.jpg}
-		\includegraphics[width=1\textwidth]{ejemplo5.jpg}
-	\end{subfigure}
-	\caption{ejemplos}
-	\label{fig:Ejmeplos}
+	\includegraphics[width=1\textwidth]{dibujo.png}
+	\caption{Ejemplo del comportamiento del modelo sobre clases invisibles. Los cuadros azul son las predicciones incorrectas y en verde las correctas.}
+	\label{fig:ejmeplosModelo}
 \end{figure}

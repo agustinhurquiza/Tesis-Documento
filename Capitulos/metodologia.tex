@@ -105,7 +105,7 @@ Como se mencionó anteriormente, el número de propuestas es un parámetro clave
 
 Para no sesgar el experimento con los datos de prueba, se definió la metodología de la siguiente manera: por cada imagen de entrenamiento se corrió el generador de propuestas, y se calculó el tiempo y la cantidad de cuadros verdaderos que tenían un IoU $> 0.5$, con algún cuadro verdadero. El tiempo es un parámetro importante ya que algunos algoritmos soy muy lentos y resultan imposible de usar. 
 
-Como se puede observar en la \autoref{tab:edgeVSselct}, \textit{Selective Search} obtiene una mayor cantidad de superposición, pero con un número exageradamente grande de propuestas, por lo que la mejor opción es usar \textit{Edge-boxes}. En cuanto número de propuestas totales, resulta mas conveniente entre 100 y 500 propuestas como máximo, ya que al aumentar este numero no se generan mejoras en superposición pero si aumenta el número de propuestas. Si tenemos en cunta el tiempo, resulta mejor \textit{Edge-boxes}, ya que demora una fracción de lo que tarda \textit{Selective Search}.\\
+Como se puede observar en la \autoref{tabla:edgeVSselct}, \textit{Selective Search} obtiene una mayor cantidad de superposición, pero con un número exageradamente grande de propuestas, por lo que la mejor opción es usar \textit{Edge-boxes}. En cuanto número de propuestas totales, resulta mas conveniente entre 100 y 500 propuestas como máximo, ya que al aumentar este numero no se generan mejoras en superposición pero si aumenta el número de propuestas. Si tenemos en cunta el tiempo, resulta mejor \textit{Edge-boxes}, ya que demora una fracción de lo que tarda \textit{Selective Search}.\\
 
 \begin{table}[]
 	\centering
@@ -121,7 +121,7 @@ Como se puede observar en la \autoref{tab:edgeVSselct}, \textit{Selective Search
 		\end{tabular}
 	}
 	\caption{Resultados de correr los distintos algoritmos de propuestas de regiones en los datos de entrenamiento. El número de propuestas verdaderas es 261.258.}
-	\label{tab:edgeVSselct}
+	\label{tabla:edgeVSselct}
 \end{table}
 
 
@@ -142,15 +142,14 @@ El experimento consistió en comparara miles de recuadros de 3 clases de entrena
 \subsection{Definición de métricas} \label{ssec:definiciondemetricas}
 Entre los diferentes conjuntos de datos anotados, utilizados por los desafíos de detección de objetos y la comunidad científica, la métrica más común utilizada para medir la precisión de las detecciones es el  \textit{Mean Average Precision (mAP)}, seguida por \textit{Recall}. Un problema que tienen la métricas en detección de objetos, es la fata de una implementación estándar para calcularlas. Además, aquellas implementaciones públicas están muy encapsuladas al código, y resulta muy difícil adaptarlo para medir rendimientos de modelos propios. Como ya se mencionó anteriormente, el código de Bansal \etal~\cite{bansal2018zero} no esta disponible, por este motivo fue necesario encontrar alguna implementación de estas métricas. A partir de estas búsqueda se encontraron varias opciones, sin embargo los resultados variaban mucho de un código a otro. Esto se debe a la falta de consenso en diferentes trabajos e implementaciones de AP, que es un problema al que se enfrentan las comunidades académicas y científicas, tal como se plantea en artículo de Padilla \etal~\cite{padilla2020survey}. Además, propone una definición y un código para estandarizar las métricas, de manera que se puedan comprar distintos modelos de una forma ``justa''. Por estos motivos decidimos utilizar este trabajo y su implementación para calcular nuestras métricas, aunque los resultados no den exactos a los reportados por Bansal \etal~\cite{bansal2018zero}.\\
 
-Ahora definamos las métricas, basándonos en el trabajo \cite{padilla2020survey}. Primero es necesario, estandarizar cuando un cuadro es:
+Ahora definamos las métricas, basándonos en el trabajo \cite{padilla2020survey}. Primero es necesario estandarizar:
 \begin{itemize}
-	\item Falso negativo (\textbf{FN}): No se obtuvo ninguna detección en absoluto, o para un cuadro delimitador verdadero el IoU $> umbral$ , y no se predijo correctamente la clase.
-	\item Falso positivo (\textbf{FP}): Para un cuadro delimitador verdadero, se predijo correctamente la clase pero el IoU $< umbral$, o es un predicción duplicada, es decir, ya se marco otra con mayor IoU como \textbf{TP}.
-	\item Verdadero positivo (\textbf{TP}): Para un cuadro verdadero, se obtuvo un IoU $> umbral$ con algún cuadro verdadero, y se predijo correctamente la clase.
+	\item Falso negativo (\textbf{FN}): Para un cuadro delimitador verdadero no se obtuvo ninguna detección en absoluto, o una propuesta tiene IoU $> umbral$ con algún cuadro verdadero y no se predijo correctamente la clase.
+	\item Falso positivo (\textbf{FP}): Una propuesta predijo correctamente la clase de un cuadro delimitador verdadero pero el IoU $< umbral$, o es un predicción duplicada, es decir, ya se marco otra con mayor IoU como \textbf{TP}, o se detecto un objeto inexistente con IoU $< umbral$ para todo cuadro verdadero.
+	\item Verdadero positivo (\textbf{TP}): Una propuesta predijo correctamente la clase y obtuvo un IoU $> umbral$ con algún cuadro verdadero.
 	\item Verdadero negativo (\textbf{TN}): Esto sólo tiene sentido si se quisiera medir propuestas que no tienen un IoU $> umbral$ con todos los cuadros verdaderos, y además se predijo como clase de fondo. Pero en este trabajo no es utilizada.
 \end{itemize}
 El umbral por lo general es 0.5, pero se puede cambiar para exigir que tenga una mayor superposición.\\
-
 
 La \textit{Recall}, también conocida como sensibilidad, mide la probabilidad de que los objetos verdaderos (los que se encuentran en la imagen) se detecten correctamente, viene dado por: 
 
@@ -169,19 +168,23 @@ Según esta definición solo se tienen en cuenta los objetos que tuvieron al men
 Bansal \etal~\cite{bansal2018zero} además calcula una variación denominada \textit{K@Recall}, donde sólo se tienen en cuentan las \textit{K} mejores propuestas basándose en la confianza de la predicción y el resto son descartadas.\\
 
 
-AP, es una métrica popular para evaluar la precisión de los detectores de objetos mediante la estimación del área bajo la curva (AUC), que viene dada por la relación de la \textit{precisión} y la \textit{recall}. Donde la precisión se define como:
+\textit{AP}, es una métrica popular para evaluar la precisión de los detectores de objetos mediante la estimación del área bajo la curva (AUC), que viene dada por la relación de la \textit{precisión} y la \textit{recall}. Donde la precisión consiste en medir el porcentaje de predicciones positivas correctas entre todas las predicciones realizadas y se define como:
 
 \begin{equation} 
 \label{eqn:precision}
 Precision =\frac{TP}{FP+TP}
 \end{equation}
- 
-La curva de \textit{precisión} $\times$ \textit{recall} puede verse como una compensación entre ambas métricas para diferentes valores de confianza asociados a los cuadros delimitadores generados por un detector. /* ToDo: organizar esto*/Si un modelo obtiene pocos FP, la \textit{precisión} será alta. Sin embargo, en este caso se pueden pasar por alto muchos aspectos interesantes de analizar. Por otro lado si se analiza la \textit{recall}, se puede reducir el numero de TP el número de FN alto. Por el contrario, si uno acepta más positivos, el \textit{recall} aumentará, pero el FP también puede aumentar, disminuyendo la precisión. Sin embargo, un buen detector de objetos debe encontrar todos los objetos reales  mientras identifica solo los objetos relevantes. Por lo tanto, un detector de objetos en particular puede considerarse bueno si su precisión permanece alta a medida que aumenta su recuperación, lo que significa que si el umbral de confianza varía, la precisión y la recall seguirán siendo altas. Por lo tanto, un área alta bajo la curva (AUC) tiende a indicar tanto una alta precisión como una alta recuperación. 
 
-Se define \textit{mAP} para la detección de objetos como el promedio del AP calculado para todas las clases. Por lo general, se indica sobre que IoU se calcula, puede ser un único valor, como por ejemplo mAP@0.5, o un conjunto de umbrales, como \textit{mAP@[x, y]}. El trabajo de Bansal \etal~\cite{bansal2018zero} reporta \textit{mAP}, pero no indica sobre que IoU se calcula, por lo cual se asume que se utilizo un valor de 0,5. Muchos trabajos que utilizan COCO, reportan \textit{mAP@[.5, .95]}. Esta métrica resulta muy útil si se quiere comparar rendimientos entre distinto trabajos.
+
+Para dibujar la curva AUC necesitamos obtener múltiples pares de valores de \textit{precisión} y \textit{recall}, esto se logra cambiando un límite de puntuación. Este limite trata como un falso positivo o todas aquellas propuesta que tengan un puntaje de confianza menor.
+
+Para entender mejor supongamos un limite tal que genera un numero de FP bajo, la \textit{precisión} será alta. Sin embargo, en este caso, se pueden pasar por alto muchos aspectos interesantes de analizar, como por ejemplo un numero de FN alto y por lo tanto una \textit{recall} baja. Pero si uno baja el limite se aceptaran más positivos y la \textit{recall} aumentará, pero el numero FP también puede aumentar, disminuyendo la \textit{precisión}. De esta manera a media que aumentamos la \textit{recall} (bajamos el limite) la \textit{presision} se tiene que mantener alta. Por esto una área alta bajo la curva (AUC) tiende a indicar tanto una alta \textit{recall} como una alta \textit{precisión}.
+
+
+Se define \textit{mAP} para la detección de objetos como el promedio del AP calculado para todas las clases. Por lo general, se indica sobre que IoU se calcula, puede ser un único valor, como por ejemplo mAP@0.5, o un conjunto de umbrales, como \textit{mAP@[x, y]} promediando el valor de \textit{mAP} para cada IoU. El trabajo de Bansal \etal~\cite{bansal2018zero} reporta \textit{mAP}, pero no indica sobre que IoU se calcula, por lo cual se asume que se utilizo un valor de 0,5. Muchos trabajos que utilizan COCO, reportan \textit{mAP@[.5, .95]}. Esta métrica resulta muy útil si se quiere comparar rendimientos entre distinto trabajos.
 
 
 \subsection{Detalles de metodología de evaluación} \label{ssec:detallesdemetodologiadeevaluacion}
 El principal experimento consistió en replicar los resultados de Bansal \etal~\cite{bansal2018zero}, aunque no se realizaron exactamente los mismos experimentos, ya que esto no aportaría nada nuevo. Así que, se decidió analizar sus resultados y solo replicar los que consideramos indispensable y que sería un buen punto de partida. Por ejemplo, los experimentos con clases de fondo, no obtuvieron buenos resultados, en comparación con los que no la utilizan, por este motivo no lo replicamos.\\
 
-Ahora definamos la metodología de evaluación. El primer paso consiste generar propuestas para cada imagen, luego cada cuadro propuesto es reescalado al tamaño de la capa de entrada que tiene la CNN, y se le extrae el vector de características visuales. Después, se utiliza el modelo entrenado para inferir el vector de características semánticas, y se calcula la similitud coseno con los vectores semánticos de todas las clases o solo las invisibles, dependiendo si se quiere evaluar ZSDG o ZSD. Aquella clase que obtenga el mayor puntaje es asignada a la propuesta. También, se guarda la puntuación como la confianza de predicción.  Por último, se agrupan todas las propuestas que se tengan asignada la misma clase y se corre un algoritmo de supresión no máxima. Este elimina las predicciones repetidas y retorna las mejores propuestas de cada grupo. Al final obtenemos como resultado un conjunto de propuestas, sus clases y su respectivo puntaje. Estos datos se guardan en un archivo y luego se corre la implementación de Padilla \etal~\cite{padilla2020survey}, para obtener los resultados de las métricas.\\
+Ahora definamos la metodología de evaluación. El primer paso consiste generar propuestas para cada imagen, luego cada cuadro propuesto es reescalado al tamaño de la capa de entrada que tiene la CNN, y se le extrae el vector de características visuales. Después, se utiliza el modelo entrenado para inferir el vector de características semánticas, y se calcula la similitud coseno con los vectores semánticos de todas las clases o solo las invisibles, dependiendo si se quiere evaluar GZSD o ZSD. Aquella clase que obtenga el mayor puntaje es asignada a la propuesta. También, se guarda la puntuación como la confianza de predicción.  Por último, se agrupan todas las propuestas que se tengan asignada la misma clase y se corre un algoritmo de supresión no máxima. Este elimina las predicciones repetidas y retorna las mejores propuestas de cada grupo. Al final obtenemos como resultado un conjunto de propuestas, sus clases y su respectivo puntaje. Estos datos se guardan en un archivo y luego se corre la implementación de Padilla \etal~\cite{padilla2020survey}, para obtener los resultados de las métricas.\\

@@ -16,7 +16,7 @@ Otro echo importante en la historia de la visión por computadora fue en 1957, R
 
 Poco tiempo después, en la década de 1960 fue cuando la IA se convirtió en una disciplina académica y algunos de los investigadores eran extremadamente optimistas sobre el futuro del campo. En este periodo, Seymour Papert, profesor del laboratorio de IA del MIT, decidió lanzar el Proyecto de Verano y resolver, en pocos meses, el problema de la visión artificial. Los estudiantes debían diseñar una plataforma que pudiera realizar automáticamente segmentación de fondo y extraer objetos no superpuestos de imágenes del mundo real. Claro esta que el proyecto no fue un éxito.  Hoy en día, cincuenta años después, todavía no se ha podido resolver la visión por computadora. Sin embargo, ese proyecto fue el nacimiento oficial de esta disciplina como campo científico. 
 
-A este acontecimiento le siguieron una gran cantidad de investigaciones que hicieron grandes aportes al campo de la visión por computadora. Como la tesis doctoral de Roberts Lawrence~\cite{roberts1963machine} en 1963 y el artículo científico de David Marr~\cite{vision_marr} en 1982, entre los más reconocidos. Sin embargo, los aportes mas influyentes en este campo empezaron a surgir a partir de los años 2000. En 2001 Paul Viola y Michael Jones~\cite{viola2001rapid} presentaron el primer detector de rostros que funcionó en tiempo real. Aunque no se basaba en el aprendizaje profundo, el algoritmo tenía una relación con éste, ya que, al procesar imágenes aprendió qué características podrían ayudar a localizar caras, inspirándose en el experimento de David Hubel y Torsten Wiesel. 
+Los aportes mas influyentes en este campo empezaron a surgir a partir de los años 2000. En 2001 Paul Viola y Michael Jones~\cite{viola2001rapid} presentaron el primer detector de rostros que funcionó en tiempo real. Aunque no se basaba en el aprendizaje profundo, el algoritmo tenía una relación con éste, ya que, al procesar imágenes aprendió qué características podrían ayudar a localizar caras, inspirándose en el experimento de David Hubel y Torsten Wiesel. 
 
 En 2006 comenzó la competencia de Pascal VOC que permitió evaluar el desempeño de diferentes métodos para el reconocimiento de objetos. Mas tarde, en 2010, siguiendo los pasos de Pascal VOC, se inició el concurso de reconocimiento visual a gran escala ImageNet (ILSVRC), cuya tasa de error durante 2010 y 2011, en el desafió de clasificación de imágenes, rondaba el 26\%.  En 2012, un equipo de la Universidad de Toronto ingresó a la competencia con un modelo de red neuronal convolucional (AlexNet)~\cite{krizhevsky2012imagenet} que cambió todo, dado que logró una tasa de error del 16,4\%. En los años siguientes, las tasas de error en la clasificación de imágenes en ILSVRC cayeron a un pequeño porcentaje, como se observa en la \autoref{fig:EvolucionILSVRC} y los ganadores, desde 2012, siempre han sido redes neuronales convolucionales.
 
@@ -60,8 +60,8 @@ Existen muchas técnicas propuestas para resolver ZSD. Cuando se empezó a leer 
 
 \begin{figure}[]
 	\centering
-	\includegraphics[width=0.8\textwidth]{img/Modelo.jpg}
-	\caption{Descripción de la tarea de detección de objetos por disparo cero, donde los objetos ``Auto'' y ``Caballo'' se observan  durante el entrenamiento, y ``Persona'', ``Perro'' y ``Moto'' son clases invisibles. El enfoque localiza estas clases invisibles aprovechando las relaciones semánticas entre las clases visibles e invisibles y su aspecto visual.}
+	\includegraphics[width=1\textwidth]{img/Modelo.png}
+	\caption{Descripción de la tarea de detección de objetos por disparo cero utilizando multimodales, donde los objetos ``Auto'', ``Camión'', ``Perro'' y ``Tigre'' se observan  durante el entrenamiento,  ``Gato'' y ``Camioneta'' son clases invisibles. El enfoque localiza estas clases no vistas aprovechando las relaciones del espacio semantico.}
 	\label{fig:EjemploZSD}
 \end{figure}
 
