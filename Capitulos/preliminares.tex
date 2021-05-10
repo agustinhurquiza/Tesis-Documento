@@ -79,50 +79,50 @@ La modalidad se refiere a la forma en que algo sucede o se experimenta. Un probl
 
 La idea general es, a partir de dos objetos matemáticos distintos, uno de cada modal, poder transformarlos para lograr que pertenezcan a un tercer objeto que corresponde a la representación multimodal. Las imágenes suelen estar asociadas con etiquetas y explicaciones de texto. En este trabajo nos aprovechamos de esto y tratamos de encontrar un espacio común entre el vector que representan a la imagen del objeto y el que representa la sintaxis de la clase.
 
-\section {Aprendizaje por disparo cero (ZSL)} \label{sec:aprendizajepordisparocero}
+\section {Aprendizaje sin ejemplos (ZSL)} \label{sec:aprendizajepordisparocero}
 ZSL es un conjunto de problemas de aprendizaje automático, donde en el momento de la prueba, se observan muestras de clases que no se observaron durante el entrenamiento y se necesita predecir la categoría a la que pertenecen. Esta se diferencia de las configuraciones estándares en el aprendizaje automático, donde se espera que se clasifiquen correctamente las nuevas muestras en las clases que ya se han observado durante el entrenamiento.
 Podemos diferenciar dos tipos de clases, las vistas que están presente en el entrenamiento y las invisibles o novedosas que no estuvieron en el mismo. Se debe proporcionar algún tipo de información complementaria sobre estas clases invisibles, este tipo de dato puede ser variado. Como por ejemplo, una descripción estructurada predefinida, que al tenerla en cuenta mejora el aprendizaje, o una descripción textual, donde las clases van acompañadas de un comentario en lenguaje natural, etc. Por último, tanto las clases visibles como las invisibles están relacionadas en un espacio vectorial, donde el conocimiento de las clases vistas se puede transferir a clases invisibles.\\
 
-El problema de aprendizaje por disparo cero se puede dividir en categorías según los datos presentes durante la fase de entrenamiento y la fase de prueba:
+El problema de aprendizaje sin ejemplos se puede dividir en categorías según los datos presentes durante la fase de entrenamiento y la fase de prueba:
 \begin{itemize}
 	\item En base a los datos disponibles en el momento de entrenar un modelo.
 	\begin{itemize}
-		\item \textbf{Aprendizaje por disparo cero inductivo:} Se tiene acceso a los datos y a la información complementario de solo las clases vistas.
-		\item \textbf{Aprendizaje por disparo cero transductivo:} Además de los datos y la información complementario de las clases vistas,  se tiene acceso a los datos de las clases no vistas.
+		\item \textbf{Aprendizaje sin ejemplos inductivo:} Se tiene acceso a los datos y a la información complementario de solo las clases vistas.
+		\item \textbf{Aprendizaje sin ejemplos transductivo:} Además de los datos y la información complementario de las clases vistas,  se tiene acceso a los datos de las clases no vistas.
 	\end{itemize}
 	\item Basado en los datos disponibles en el momento de la inferencia.
 	\begin{itemize}
-		\item \textbf{Aprendizaje por disparo cero convencional (ZSL):} En las pruebas solo se evalúan las clases no vistas.
-		\item \textbf{Aprendizaje por disparo cero generalizado (GZSL):} En las pruebas se evalúan tanto las clases vista como las no vistas.
+		\item \textbf{Aprendizaje sin ejemplos convencional (ZSL):} En las pruebas solo se evalúan las clases no vistas.
+		\item \textbf{Aprendizaje sin ejemplos generalizado (GZSL):} En las pruebas se evalúan tanto las clases vista como las no vistas.
 	\end{itemize}
 \end{itemize}
 
-\section {Detección de objeto por disparo cero (ZSD)} \label{sec:detecciondeobjetopordisparocero}
-La Detección de objeto por disparo cero (ZSD), tiene como objetivo reconocer y localizar simultáneamente instancias de objetos que pertenecen a categorías novedosas sin ningún ejemplo de entrenamiento. Como estas categorías no están presente en el entrenamiento, no se tiene ninguna información sobre su aspecto visual, lo cual no nos permite detectarlas ni reconocerlas. Por lo tanto, es necesario encontrar algún dominio que tenga la capacidad de guardar la información de todas las clases, para luego relacionarlas con el aspecto visual de las categorías novedosas.
+\section {Detección de objeto sin ejemplos (ZSD)} \label{sec:detecciondeobjetopordisparocero}
+La Detección de objeto sin ejemplos (ZSD), tiene como objetivo reconocer y localizar simultáneamente instancias de objetos que pertenecen a categorías novedosas sin ningún ejemplo de entrenamiento. Como estas categorías no están presente en el entrenamiento, no se tiene ninguna información sobre su aspecto visual, lo cual no nos permite detectarlas ni reconocerlas. Por lo tanto, es necesario encontrar algún dominio que tenga la capacidad de guardar la información de todas las clases, para luego relacionarlas con el aspecto visual de las categorías novedosas.
 
-Este trabajo se basa en el artículo científico de Bansal \etal ~\cite{bansal2018zero}, además utiliza muchos conceptos sobre disparo cero generalizado~\cite{zero-shot-generalizado}. Se propone un modelo de disparo cero inductivo, es decir, solo se observan imágenes de clases vistas y etiquetas que indican a que clase pertenece. Estas etiquetas son palabras del lenguaje natural sin ninguna estructura. Luego, se puede inferir todas las clases o solo las invisibles, dependiendo de si se quiere evaluar aprendizaje por disparo cero generalizado o convencional, respectivamente.\\ 
+Este trabajo se basa en el artículo científico de Bansal \etal ~\cite{bansal2018zero}, además utiliza muchos conceptos sobre sin ejemplos generalizado~\cite{zero-shot-generalizado}. Se propone un modelo sin ejemplos inductivo, es decir, solo se observan imágenes de clases vistas y etiquetas que indican a que clase pertenece. Estas etiquetas son palabras del lenguaje natural sin ninguna estructura. Luego, se puede inferir todas las clases o solo las invisibles, dependiendo de si se quiere evaluar aprendizaje por sin ejemplos generalizado o convencional, respectivamente.\\ 
 
-El requisito estricto de no utilizar ninguna imagen de clase invisible durante el entrenamiento es una condición difícil. Además, existen otras dificultades en la tarea de detección de disparo cero relacionadas al conjunto de datos de entrenamiento y prueba, es decir entre las clases vistas e invisibles. Estas dificultades son:
+El requisito estricto de no utilizar ninguna imagen de clase invisible durante el entrenamiento es una condición difícil. Además, existen otras dificultades en la tarea de detección sin ejemplos relacionadas al conjunto de datos de entrenamiento y prueba, es decir entre las clases vistas e invisibles. Estas dificultades son:
 
 \begin{itemize}
 	\item \textbf{Rareza}: los conjuntos de datos, por lo general, contiene un problema de distribución, es decir, muchas clases raras tienen menos cantidad de instancias. Este problema hace que las clases con mayor cantidad de instancias sesguen el modelo y las clases más raras sean marcadas incorrectamente en la etapa de prueba. Esto es un problema al momento de comparar dos modelos que fueron entrenados con distintas clases, ya que algunas separaciones  de las clases resultan mejores que otras.
 
 	\item \textbf{Tamaño del objeto}: algunas clases de objetos raros (tijeras, lápices, celulares, etc.), suelen tener un tamaño pequeño. Los objetos más pequeños son difíciles de detectar y reconocer. También, tienen el problema de que por lo general están junto a objetos más grandes como una mesa o una persona y se ven opacadas por estas clases.
 
-	\item \textbf{Diversidad}: cuando una clase invisible no tiene otras clases visualmente similares, resulta muy difícil aprender el aspecto visual de esta. Por ejemplo, ``auto'' tiene muchas clases similares en comparación con ``cartel''. Esto permite una descripción visual inadecuada de la clase invisible ``cartel'' que eventualmente afectará el rendimiento de detección de disparo cero, a diferencia de lo que sucede con la clase ``auto''.
+	\item \textbf{Diversidad}: cuando una clase invisible no tiene otras clases visualmente similares, resulta muy difícil aprender el aspecto visual de esta. Por ejemplo, ``auto'' tiene muchas clases similares en comparación con ``cartel''. Esto permite una descripción visual inadecuada de la clase invisible ``cartel'' que eventualmente afectará el rendimiento de detección sin ejemplos, a diferencia de lo que sucede con la clase ``auto''.
 
-	\item \textbf{Ruido en el espacio semántico}: cuando se utiliza los vectores de incrustación semántica no supervisados como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}, las incrustaciones resultante en general son ruidosas, ya que se generan automáticamente a partir de la minería de texto no anotado. Esto también afecta significativamente el rendimiento de la detección de disparo cero.
+	\item \textbf{Ruido en el espacio semántico}: cuando se utiliza los vectores de incrustación semántica no supervisados como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}, las incrustaciones resultante en general son ruidosas, ya que se generan automáticamente a partir de la minería de texto no anotado. Esto también afecta significativamente el rendimiento de la detección sin ejemplos.
 \end{itemize}
 
 Existen algunas variaciones de ZSD que intentan atenuar estos problemas, agrupando las clases en grupos o metaclases. Estas variaciones son: 
 
 \begin{itemize}
 
-	\item \textbf{Detección de metaclase de disparo cero (ZSMD)}, que dada una imagen de prueba, el objetivo es localizar cada instancia de una clase de objeto invisible y categorizarla en una de las superclases.
+	\item \textbf{Detección de metaclase sin ejemplos (ZSMD)}, que dada una imagen de prueba, el objetivo es localizar cada instancia de una clase de objeto invisible y categorizarla en una de las superclases.
 
-	\item \textbf{Etiquetado de disparo cero (ZST)}, consiste en reconocer una o más clases invisibles en una imagen de prueba, sin identificar su ubicación.
+	\item \textbf{Etiquetado sin ejemplos (ZST)}, consiste en reconocer una o más clases invisibles en una imagen de prueba, sin identificar su ubicación.
 
-	\item \textbf{Etiquetado de metaclase de disparo cero (ZSMT)}, reconoce una o más metaclases en una imagen de prueba, sin identificar su ubicación.
+	\item \textbf{Etiquetado de metaclase sin ejemplos (ZSMT)}, reconoce una o más metaclases en una imagen de prueba, sin identificar su ubicación.
 
 \end{itemize}
 

@@ -7,7 +7,7 @@ Denotamos a una imagen como $\mathcal{I} \in \mathbb{D}^{\mathcal{M} \times \mat
 
 Por cada imagen se provee un conjunto de cuadros delimitadores  $\mathbb{B} = \{b_0,...,b_k\mid b_i \in N^4\}$ y sus etiquetas asociadas como $\mathbb{Y} = \{y_0,...,y_k\mid y_i \in \mathcal{C}\}$. Para cada cuadro delimitador $b_i$ extraemos una característica profunda utilizando una red neuronal convolucional denotada como $\phi(b_i) \in \mathbb{R}^{D_1}$. 
 
-Denotamos las incrustaciones semánticas $w_j \in  \mathbb{R}^{D_2}$ obtenido por algún modelo como Wor2Vec. El conjunto de todas las imágenes de entrenamiento se indica con $\mathcal{X}^s$, que contiene ejemplos de todas las clases de objetos visibles.  El conjunto de todas las imágenes de prueba que contienen muestras de clases de objetos invisibles se indica con  $\mathcal{X}^u$. En particular, no hay ningún objeto de clase invisible en $\mathcal{X}^s$, pero $\mathcal{X}^u$ puede contener objetos vistos.\\
+Denotamos las incrustaciones semánticas $w_j \in \mathbb{R}^{D_2}$ obtenido por algún modelo como Word2Vec~\cite{mikolov2013distributed}. El conjunto de todas las imágenes de entrenamiento se indica con $\mathcal{X}^s$, que contiene ejemplos de todas las clases de objetos visibles.  El conjunto de todas las imágenes de prueba que contienen muestras de clases de objetos invisibles se indica con  $\mathcal{X}^u$. En particular, no hay ningún objeto de clase invisible en $\mathcal{X}^s$, pero $\mathcal{X}^u$ puede contener objetos vistos.\\
 
 El objetivo es encontrar una matriz de proyección $W_p$, tal que \[ \psi_i = W_p\phi(b_i) \:\:\:\mid\:\:\: W_P \in \mathbb{R}^{D_2 \times D_1},\:\:\: \psi_i \in \mathbb{R}^{D_2} \] Note que $\psi_i$ y las incrustaciones semánticas se encuentran en el mismo dominio. Como mencionamos en secciones anteriores, el espacio vectorial semántico, tiene una gran capacidad de capturar similitudes semánticas. Por lo cual, resulta clave encontrar una matriz que para cada cuadro delimitador se proyecte lo más cerca posible a la incrustación semántica de su clase. 
 
@@ -23,12 +23,12 @@ donde $x \in \mathcal{X}^s$ durante el entrenamiento. La función de mapeo utili
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{img/arquitectura.png}
-	\caption{Arquitectura propuesta para ZSD, utilizando incrustaciones semánticas y visuales, ademas se muestra la dimensión en cada paso.}
+	\caption{Arquitectura propuesta para ZSD, utilizando incrustaciones semánticas y visuales, además se muestra la dimensión en cada paso.}
 	\label{fig:arqutectura}
 \end{figure}
 Como se menciono anteriormente, hemos decido basarnos en el modelo propuesto por Bansal \etal~\cite{bansal2018zero} para abordar el problema de ZSD. La arquitectura propuesta en este  trabajo se puede dividir en las siguientes etapas:
 \begin{itemize}
-	\item \textbf{Pre-procesamiento:} Se recorren todas las imagen de entrenamiento y se extrae una característica profunda por cada cuadro delimitador, utilizando una red neuronal convolucional. Éste se asocia con el vector semántico de la clase que tiene asignada el cuadro, que se puede obtener con modelos de incrustación de palabras previamente entrenados, como Glove o Word2vec. Esta etapa nos genera como salida dos listas 
+	\item \textbf{Pre-procesamiento:} Se recorren todas las imagen de entrenamiento y se extrae una característica profunda por cada cuadro delimitador, utilizando una red neuronal convolucional. Éste se asocia con el vector semántico de la clase que tiene asignada el cuadro, que se puede obtener con modelos de incrustación de palabras previamente entrenados, como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}. Esta etapa nos genera como salida dos listas 
 	\[X = [\phi(b_0),...,\phi(b_k) \mid \phi(b_i) \in \mathbb{R}^{D_1}]\] 
 	\[W = [w_0,...,w_k \mid w_i \in \mathbb{R}^{D_2}]\]
 	
