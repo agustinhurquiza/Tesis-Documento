@@ -11,7 +11,7 @@ Las redes CNN se a utilizado para resolver distintos problemas como, la detecci�
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{img/red_cnn.png}
-	\caption{Una arquitectura simplificada de una rede neuronal convolucional.}
+	\caption{Una arquitectura simplificada de una red neuronal convolucional.}
 	\label{fig:CNNEjemplo}
 \end{figure}
 
@@ -19,7 +19,7 @@ Las redes CNN se a utilizado para resolver distintos problemas como, la detecci�
 Así como en las imágenes utilizamos las redes CNN, para obtener un vector que represente a la misma, es necesario un procedimiento para representar palabras con algún objeto matemático. Hay muchas formas de representar palabras, la más usada son los \textit{word embedding}. Esta es una técnica de aprendizaje en el campo de procesamiento del lenguaje natural (PLN), capaz de capturar el contexto de una palabra en un documento, calcular similitud semántica y sintáctica con otras palabras.\\
 
 Para entender como funcionan, consideremos las oraciones con un significado similar: ``Que tengas un buen día.'' y ``Que tengas un gran día.''. Si construimos un vocabulario exhaustivo:
- \[ V = \{que, tengas, un, buen, gran, dia\}. \]
+ \[ V = \{que, tengas, un, buen, gran, día\}. \]
 A partir de esto, se puede crear un vector codificado para cada una de estas palabras, en donde cada vector tenga el tamaño de $V$, cuyos componentes sean todos 0 excepto por el elemento en el índice que representa la palabra correspondiente en el vocabulario, que contiene un 1. Esta representación no resulta conveniente ya que la distancia entre \textit{gran} y \textit{buen} es la misma que entre \textit{tengas} y \textit{buen}.  El objetivo es que las palabras con un contexto similar ocupen posiciones espaciales cercanas. Para lograr esto, se introduce cierta dependencia de una palabra con las otras.\\
 
 Word2Vec~\cite{mikolov2013distributed} desarrollado por Tomas Mikolov en 2013. Es un modelo particularmente eficiente desde el punto de vista computacional. Este modelo se encuentra disponible de dos formas: \textit{Continuous Bag-of-Words} (CBOW) o el modelo \textit{Skip-Gram}. En CBOW, las representaciones distribuidas de contexto (o palabras circundantes) se combinan para predecir la palabra en el medio. En nuestro ejemplo \textit{gran} y \textit{buen} están rodeado de un contexto similar por lo cual resultan en vectores similares. Es varias veces más rápido de entrenar que el \textit{Skip-gram}, y tiene una precisión ligeramente mejor para las palabras frecuentes. Mientras que en el modelo \textit{Skip-gram}, la representación distribuida de la palabra de entrada se usa para predecir el contexto. Se entrena con una tarea falsa que, dada una palabra, intenta predecir las palabras vecinas. En realidad, el objetivo es solo aprender los pesos de la capa oculta que corresponden a los vectores de palabras que estamos tratando de aprender. Por ejemplo, \textit{Gran} se entrena para predecir el contexto \textit{un} y  \textit{día}, al igual que \textit{buen}. Funciona bien con una pequeña cantidad de datos de entrenamiento.
