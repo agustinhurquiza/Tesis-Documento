@@ -28,24 +28,6 @@ Supongamos que las etiquetas solo cuenta con dos tipos de información, que clas
 La \autoref{fig:DetectoresYSZD} muestra un ejemplo de los resultados esperados por las distintas tareas.\\
 
 Además de los problemas mencionados anteriormente, existen otros como la segmentación, que no desarrollaremos en este trabajo. Aquí, solo nos enfocaremos en ZSD y sus problemas asociados.
- 
-Existen muchas técnicas propuestas para resolver ZSD. Cuando se empezó a leer sobre este tema a fines del 2018, la más utilizada consistía en emplear multimodales. Puntualmente existían tres trabajos en paralelos \cite{rahman2018zero}\cite{zhu2018zero}\cite{bansal2018zero} con una metodología similar. La idea de esta técnica es utilizar un espacio compartido ente las representaciones de visión y del lenguaje. Para lograr esto, se utiliza  \textbf{incrustaciones de palabras} y \textbf{vectores con representaciones visuales}. Las primeras asignan a palabras una representación vectorial continua. Estos vectores se utilizan para medir similitudes semánticas y sintácticas entre palabras. Entre los modelos más famosos se encuentran Glove~\cite{pennington-etal-2014-glove} y Word2vec~\cite{mikolov2013efficient}. Por otro lado, para obtener los vectores visuales de una imagen se utilizan redes profundas. Entre los mejores modelos se encuentran VGG~\cite{simonyan2014very}, ResNet~\cite{resnet} e Inception~\cite{Szegedy_2015_CVPR}. La~\autoref{fig:EjemploZSD} describe como se utiliza la combinación de vectores de palabras y visuales para inferir un objetos nunca antes vistos por el modelo.\\
-
-\begin{figure}[]
-	\centering
-	\includegraphics[width=1\textwidth]{img/Modelo.png}
-	\caption{Descripción de la tarea de detección de objetos por disparo cero utilizando multimodales, donde los objetos ``Auto'', ``Camión'', ``Perro'' y ``Tigre'' se observan  durante el entrenamiento,  ``Gato'' y ``Camioneta'' son clases invisibles. El enfoque localiza estas clases no vistas aprovechando las relaciones del espacio semántico.}
-	\label{fig:EjemploZSD}
-\end{figure}
-
-\section{Motivación} \label{sec:motivacion}
-
-Hoy en día, hay una gran cantidad de modelos, capaces de detectar objetos en una imagen, como son las redes YOLO~\cite{redmon2016you} o Faster R-CNN~\cite{ren2015faster}. Estos, como otros no mencionados, poseen un excelente rendimiento, pero tienen una gran limitación, necesitan una gran cantidad de imágenes anotadas, para cada clase que se quiere detectar. Conseguir un gran numero de anotaciones, pude resultar un gran desafió, ya sea por la naturaliza del problema o por los grandes costo que esto conlleva. Esta dificultad se intenta mitigar con ZSD dado que puede inferir objetos no anotados.
-
-ZSD es una habilidad que los humanos ya tienen. De hecho, podemos aprender muchas cosas con solo un ``conjunto de datos mínimo". Por ejemplo, tendemos a diferenciar  variedades de la misma fruta o frutas de aspecto similar, aun si hemos visto muy pocas veces cada tipo de fruta. La situación es diferente para las máquinas. Necesitan muchas imágenes para aprender a adaptarse a la variación que se produce de forma natural en lo humanos. Esta habilidad proviene de nuestra base de conocimientos lingüísticos existente, que proporciona una descripción de alto nivel de una clase nueva o no vista y establece una conexión entre ella y las clases que ya conocemos. Como la visión por computadora intenta simular en una maquina el comportamiento de la visión humana, resulta razonable intentar resolver este problema de manera similar a como nosotros interpretamos el contexto visual.
-
-Por unos minutos dejemos llevarnos por la imaginación y supongamos que se quiere crear un programa capas de reconocer todos los objeto en una imagen, pero objetos de cualquier índole, animales, plantas, artículos de limpieza, o cualquier cosa que se te venga a la mente. Seria casi imposible, si es que no lo es, generar un conjunto de datos que contenga una cantidad considerable de imágenes de todos los objetos posible. Esta idea puede sonar muy descabellada, pero no se puede negar su potencial y su gran cantidad de usos como en interpretaciones de escenas, seguridad, etc. A medida que ZSD continúa desarrollándose, se espera ver más aplicaciones, como mejores recomendaciones y soluciones más avanzadas que marcan automáticamente el contenido inadecuado dentro de las redes sociales, como así también un fuerte desarrollo en el campo de la robótica.
-
 
 \section{Historia} \label{sec:historia}
 La detección de objetos es una de las áreas de la visión por computadora de mayor crecimiento en los últimos años. Gracias al aprendizaje profundo, cada año, los nuevos algoritmos/modelos siguen superando a los anteriores. Aunque la visión por computadora recientemente tomó gran importancia (el momento decisivo ocurrió en 2012 cuando AlexNet~\cite{krizhevsky2012imagenet} ganó ImageNet), ciertamente no es un nuevo campo científico.\\
@@ -67,7 +49,7 @@ Los aportes más influyentes en este campo empezaron a surgir a partir de los a�
 
 En 2006, comenzó la competencia de Pascal VOC que permitió evaluar el desempeño de diferentes métodos para el reconocimiento de objetos. Más tarde en 2010, siguiendo los pasos de Pascal VOC, se inició el concurso de reconocimiento visual a gran escala ImageNet (ILSVRC) cuya tasa de error durante 2010 y 2011, en el desafío de clasificación de imágenes, rondaba el 26\%.  En 2012, un equipo de la Universidad de Toronto ingresó a la competencia con un modelo de red neuronal convolucional (AlexNet)~\cite{krizhevsky2012imagenet} que cambió todo, dado que logró una tasa de error del 16,4\%. Este suceso impulso a que problemas como la detección de objeto empezaran a utilizar este tipo de red y mejoraran considerablemente. Como se refleja en la figura \autoref{fig:evolucion}.
 
-\begin{figure}[]
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}{0.75\textwidth}
 		\centering
@@ -86,6 +68,31 @@ En 2006, comenzó la competencia de Pascal VOC que permitió evaluar el desempe�
 	\label{fig:evolucion}
 \end{figure}
 
+
+\section{Esfuerzos recientes en la detección de objetos sin ejemplos}\label{sec:esfuerzosrecientesenladetecciondeobjetossinejemplos}
+
+Existen muchas técnicas propuestas para resolver ZSD. Cuando se empezó a leer sobre este tema a fines del 2018, la más utilizada consistía en emplear multimodales. Puntualmente existían tres trabajos en paralelos con una metodología similar. \cite{bansal2018zero} propuso un enfoque basado en características donde las propuestas de objetos se generan mediante edge-box. \cite{zhu2018zero} propone un método basado en el detector YOLO. \cite{rahman2018zero} propuso una extensión de Faster R-CNN junto a un nuevo enfoque transductivo para asociar objetos novedosos en el espacio semántico.\\
+ 
+La idea de multimodales es utilizar un espacio compartido ente las representaciones de visión y del lenguaje. Para lograr esto, se utiliza  \textbf{incrustaciones de palabras} y \textbf{vectores con representaciones visuales}. Las primeras asignan a palabras una representación vectorial continua. Estos vectores se utilizan para medir similitudes semánticas y sintácticas entre palabras. Entre los modelos más famosos se encuentran Glove~\cite{pennington-etal-2014-glove} y Word2vec~\cite{mikolov2013efficient}. Por otro lado, para obtener los vectores visuales de una imagen se utilizan redes profundas. Entre los mejores modelos se encuentran VGG~\cite{simonyan2014very}, ResNet~\cite{resnet} e Inception~\cite{Szegedy_2015_CVPR}. La~\autoref{fig:EjemploZSD} describe como se utiliza la combinación de vectores de palabras y visuales para inferir un objetos nunca antes vistos por el modelo.\\
+
+\begin{figure}[]
+	\centering
+	\includegraphics[width=1\textwidth]{img/Modelo.png}
+	\caption{Descripción de la tarea de detección de objetos por disparo cero utilizando multimodales, donde los objetos ``Auto'', ``Camión'', ``Perro'' y ``Tigre'' se observan  durante el entrenamiento,  ``Gato'' y ``Camioneta'' son clases invisibles. El enfoque localiza estas clases no vistas aprovechando las relaciones del espacio semántico.}
+	\label{fig:EjemploZSD}
+\end{figure}
+
+En los últimos dos años se publicaron nuevos trabajos utilizando esta técnica.~\cite{rahman2020zero} que mejora los modelos y resultados de su trabajo previo~\cite{rahman2018zero}.~\cite{gupta2020multi} donde combina predicciones obtenidas en dos espacios de búsqueda diferentes.~\cite{rahman2020improved} proponen  una función de pérdida novedosa que maneja el desequilibrio de clases y busca alinear adecuadamente las señales visuales y semánticas.
+
+\section{Motivación} \label{sec:motivacion}
+
+Hoy en día, hay una gran cantidad de modelos, capaces de detectar objetos en una imagen, como son las redes YOLO~\cite{redmon2016you} o Faster R-CNN~\cite{ren2015faster}. Estos, como otros no mencionados, poseen un excelente rendimiento, pero tienen una gran limitación, necesitan una gran cantidad de imágenes anotadas, para cada clase que se quiere detectar. Conseguir un gran numero de anotaciones, pude resultar un gran desafió, ya sea por la naturaliza del problema o por los grandes costo que esto conlleva. Esta dificultad se intenta mitigar con ZSD dado que puede inferir objetos no anotados.
+
+ZSD es una habilidad que los humanos ya tienen. De hecho, podemos aprender muchas cosas con solo un ``conjunto de datos mínimo". Por ejemplo, tendemos a diferenciar  variedades de la misma fruta o frutas de aspecto similar, aun si hemos visto muy pocas veces cada tipo de fruta. La situación es diferente para las máquinas. Necesitan muchas imágenes para aprender a adaptarse a la variación que se produce de forma natural en lo humanos. Esta habilidad proviene de nuestra base de conocimientos lingüísticos existente, que proporciona una descripción de alto nivel de una clase nueva o no vista y establece una conexión entre ella y las clases que ya conocemos. Como la visión por computadora intenta simular en una maquina el comportamiento de la visión humana, resulta razonable intentar resolver este problema de manera similar a como nosotros interpretamos el contexto visual.
+
+Por unos minutos dejemos llevarnos por la imaginación y supongamos que se quiere crear un programa capas de reconocer todos los objeto en una imagen, pero objetos de cualquier índole, animales, plantas, artículos de limpieza, o cualquier cosa que se te venga a la mente. Seria casi imposible, si es que no lo es, generar un conjunto de datos que contenga una cantidad considerable de imágenes de todos los objetos posible. Esta idea puede sonar muy descabellada, pero no se puede negar su potencial y su gran cantidad de usos como en interpretaciones de escenas, seguridad, etc. A medida que ZSD continúa desarrollándose, se espera ver más aplicaciones, como mejores recomendaciones y soluciones más avanzadas que marcan automáticamente el contenido inadecuado dentro de las redes sociales, como así también un fuerte desarrollo en el campo de la robótica.
+
 \section{Estructura de la tesis} \label{sec:estructuradelatesis}
 
 Esta tesis se estructura de la siguiente manera. En el~\autoref{cap:preliminares} se detallan los conceptos fundamentales utilizado a lo largo del trabajo. En el~\autoref{cap:metodologia} se formaliza el problema de ZSD y se define la arquitectura empleada para resolverlo. Además, se describe los conjuntos de datos utilizados para entrenar y medir el rendimiento del modelo, como así también los detalles de nuestra implementación. Por último se define las distintas métricas utilizadas y describe los distintos experimentos realizados. Luego en el~\autoref{cap:analisideresultado} se analizan los resultados obtenidos y se compara con distintos trabajos. El~\autoref{cap:conclusiones} expone las conclusiones que se obtuvieron, los aportes realizados por esta tesis, y los trabajos futuros o mejoras.
+
