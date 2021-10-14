@@ -1,0 +1,168 @@
+\chapter{Modelado y conjuntos de datos}\label{cap:arquitecturayconjuntosdedatos}
+
+En este capítulo se detalla la solución propuesta en el trabajo para resolver ZSD, se explayan las distintas etapas, se presentan los conjuntos de datos utilizados y como se puede evaluar los modelos de ZSD Y GZSD en estos conjuntos.
+
+En la actualidad la arquitectura mas utilizado por la comunidad científica para resolver el problema de ZSD, es utilizar el espacio que forman modelos como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove} para transferir el conocimiento de las clases vistas a las inviables. Luego de analizar los distintos artículos (ver \autoref{ssec:trabajosrecientesenzsd}). Basándonos en la complejidad del modelo y sus resultados, se decidió apoyarse en el trabajo de Bansal \etal~\cite{bansal2018zero} para abordar el problema de ZSD.
+
+En las siguientes secciones se abordaran las distintas etapas y los detalles de la arquitectura.
+
+
+\section{Modelado}\label{ssec:preprocesamiento} 
+Antes de detallar el entrenamiento de la arquitectura, es necesario explayar como se modifican los datos, para poder ser utilizados.
+
+Cada dato de entrenamiento consiste de una imagen y un conjunto de cuadros delimitadores con el nombre de la clase del objeto que se encuentra dentro del cuadro. El objetivo de esta etapa es generar por cada imagen un conjunto de puntos en el espacio visual y semantico que corresponde a cada cuadro. Por un lado, se recortan los cuadros de la imagen $x_i$ y se recalan a un tamaño fijo, por ejemplo 224$\times$224. Luego se utiliza una CNN pre-entrenada como VGG16~\cite{simonyan2014very} para generar los vectores visuales de cada cuadro. La salida de este paso es:
+
+\[B_i = [\phi(b_0),...,\phi(b_k) \mid \phi(b_i) \in \mathbb{R}^{D_1}]\] 
+
+Donde $B_i$ son todas los vectores de caracteristicas visuales de la imagen $x_i$.
+
+Por otro lado, cada cuadro se asocia con el vector semántico de la clase que tiene asignado, que se puede obtener con modelos de vectores de palabras previamente entrenados, como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}. Dando como resultado:
+
+\[W_i = [w_0,...,w_k \mid w_i \in \mathbb{R}^{D_2}]\]
+
+Con $W_i$ los vectores semánticos asociado a cada cuadro. En la \autoref{fig:arqutectura} se ejemplifica los pasos antes mencionados.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/arquitectura.png}
+	\caption{Esquema del pre-procesamiento de las imágenes y como se obtienen los vectores semánticos y visuales.}
+	\label{fig:arqutectura}
+\end{figure}
+
+
+En la inferencia se quiere predecir la clase a la que pertenece cada cuadro delimitador en una imagen, para esto, se computa el vector visual $\phi(b_i)$ obtenido por una CNN como VGG16~\cite{simonyan2014very}, y luego utilizando la matriz de proyección $W_p$ (que nos permite pasar del dominio visual al semantico, ver \autoref{ssec:formalizaciondezsd}) calculamos el vector semantico asociado al vector visual. Por ultimo se calcula la similitud coseno entre el vector semantico obtenido y el de las de todas las clases que se quiere evaluar, asignándole a esa propuesta la que obtenga un mejor puntaje. La \autoref{fig:arquitectura_prueba} muestra la arquitectura empleada en la etapa de inferencia.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/arquitectura_prueba.png}
+	\caption{Arquitectura propuesta para evaluar el modelo de ZSD, utilizando vectores semánticos y visuales.}
+	\label{fig:arquitectura_prueba}
+\end{figure}
+
+\section{Entrenamiento del modelo}\label{ssec:entrenamiento}
+
+\subsection{Función de costo}
+
+Utilizamos el espacio semantico (${R}^{D_2}$) para calcular una medida de similitud entre las proyecciones $\phi(b_j) \in X_i	$ y los vectores semánticos $w_j \in W_i$. Luego, para entrena la proyección $W_p$, que nos permite transformar un vector del espacio visual a uno del espacio semantico, definimos una función de costo, que imponga la restricción que el puntaje de la similitud de un cuadro delimitador, con su clase verdadera, debe ser más alto que el de otras clases. Por ejemplo, la proyección de un cuadro que tiene un ``perro'', tiene que estar lo mas cerca posible del vector semantico ``perro'', y a su ves lejos de cualquier otro vector semantico.
+
+Utilizaremos la función de costo definida como: 
+
+\[\mathcal{L}(\psi_i, w_i) = \sum_{j \in \mathcal{S}, j\neq i} max(0, m - S_{ii} + S_{ij})\] 
+donde $m$ es el margen máximo, y $S_{ij}$ es la similitud entre la proyección $i$-$esima$ y el vector semantico $j$-$esimo$. 
+
+Para comprender mejor esta función supongamos un margen máximo de 1 y que para todo $S_{ij}$ se cumple $0 < S_{ij} < 1$. Si la similitud entre la proyección y su vector semantico ($S_{ii}$) es cercano a 1, la función solo dependen de los $S_{ij}$ con $j \neq i$, mientras mas cercanos a 0 la función de costo si minimiza y mientra mas altos esta aumenta. Por otro lado, si la similitud $S_{ii}$ es aproximadamente 0, estaríamos penalizando la función sin importar los $S_{ij}$, pero si estos aumentan empeoran el resultado. \\
+
+
+También se agrega una función de pérdida de reconstrucción como sugieren Kodirov \etal~\cite{kodirov2017semantic}. Se utilizan las características del cuadro delimitador proyectadas para reconstruir los vectores visuales originales, y calcular la pérdida de reconstrucción como la distancia $L2$  entre el vectores reconstruido y el original.
+\[\mathcal{L}_r = \Vert{\phi(b_i) - \psi_iW_p^T}\Vert^2 \] 
+Luego, definimos $\lambda$ como un coeficiente de ponderación que controla la importancia del primer y segundo término, que corresponden a las pérdidas de proyección y reconstrucción respectivamente. Por lo cual la función de perdida total es: 
+\[\mathcal{L}_t = \lambda \mathcal{L} + (1-\lambda) \mathcal{L}_r \]
+ 
+Es común que en la detección de objetos se incluya una clase de fondo, para obtener un detector robusto que pueda discriminar eficazmente entre objetos de primer plano y objetos de fondo. En ZSD, esto no es un problema trivial, ya que no se sabe si un cuadro de fondo incluye elementos como cielo, tierra, bosque, etc. o una instancia de una clase de objeto invisible. En muchos trabajos se proponen distintas técnicas para abordar este problema, pero no presentan mejoras en evaluaciones cuantitativas. Es por esto que no se incluye una arquitectura que discrimine cuadros de fondos.
+
+
+\section{Conjuntos de datos} \label{sec:conjuntosdedatos}
+
+En la actualidad no existe un conjunto de datos pensado para evaluar ZSD, es por esto que se tiene que adaptar otros conjuntos de datos para poder medir el rendimiento de los modelos. Otra posibilidad es crear un conjunto de dato sintético que emule imágenes de la vida real para ser utilizados en ZSD.
+
+\subsection{Common Objects in Context (COCO)}\label{ssec:commonobjectsincontext}
+
+COCO es una base de datos que tiene como objetivo ayudar en la investigación de detección de objetos, posee varias caracteristicas como segmentación de instancias, subtítulos de imágenes y localización de puntos clave de personas. Este conjunto de datos contiene 80 tipos de objetos o  clases, con un total de 2.5 millones de instancias etiquetadas en 328.000 imágenes. La \autoref{fig:ejemplo_coco} muestra algunas imágenes que forman parte del conjunto COCO.
+
+\begin{figure}
+	\begin{center}
+		\centering
+		\includegraphics[width=1\textwidth]{img/coco_ejemplo.png}
+		\caption{Ejemplos de imágenes del conjunto de datos COCO.}
+		\label{fig:ejemplo_coco}
+	\end{center}	
+\end{figure}
+
+La gran cantidad de instancias de objetos y de categorías, resulta en un conjunto ideal para entrenar y evaluar modelos de ZSD. Además, la mayoría de la imágenes consta de una gran cantidad de objetos, a diferencia de conjuntos como Visual Genome~\cite{krishnavisualgenome}. Esto generan un contexto en el que varios objetos se relacionan y se superponen, emulando de una mejor manera situaciones de la vida real. 
+
+En este trabajo se utilizan las imágenes de entrenamiento del conjunto COCO 2014 e imágenes del conjunto de validación para realizar las pruebas de ZSD.
+\begin{figure}
+	\begin{center}
+		\centering
+		\includegraphics[width=1\textwidth]{img/data_set.png}
+		\caption{División de las clases para entrenamiento (verde) y pruebas (azul).}
+		\label{fig:data_set}
+	\end{center}	
+\end{figure}
+
+Como COCO no provee una separación de los datos para evaluar modelos de ZSD, es necesario crear una forma de dividir las clases en vistas e invisibles. Esta separación resulta de suma importancia, ya que se debe cumplir que para todo objeto del conjunto prueba, exista otro de aspecto similar que este presente durante el entrenamiento. Además, no se puede encontrar ningún objeto de prueba en los datos de entrenamiento. Para esto, se aprovecha de que COCO tiene agrupadas las clases por ``Clases superiores'' que agrupa varias clases que tienen alguna relacion, por ejmeplo la clase superior animales contiene las clases zebra, perro, gato, etc. Por cada uno de estos grupos se elige de forma aleatoria un 70\% de clases para entrenamiento y un 30\% para pruebas. Es decir, 47 y 18 clases respectivamente, de un total de 65 clases de COCO 2014. En la~\autoref{fig:data_set} se puede observar el resultado de esta división. Por último se eliminaron todas las imágenes de entrenamiento que contengan al menos una instancia de las clases de prueba. Esto resulta en 42564 imágenes con 261258 instancias de entrenamiento, y 3008 imágenes con 10878 instancias de prueba. 
+
+Bansal \etal~\cite{bansal2018zero}, divide el conjunto de datos de manera similar, utilizando la misma cantidad de clases para las etapas de prueba y entrenamiento. Pero la diferencia radica en que utiliza los vectores densos de palabras para agrupar las clases, utilizando la  similitud coseno entre los vectores como métrica. Por último, elige de forma aleatoria las clases visibles e invisibles de cada grupo. En este trabajo también se utiliza esta separación para logra una comparación de modelos más justa.
+
+
+\subsection{CIFAR-ZSD} \label{ssec:cifarzsd}
+\begin{figure}[H]
+	\begin{center}
+		\begin{subfigure}{.3\textwidth}
+			\includegraphics[width=1\textwidth]{img/cifar-zsd-test400.jpg}
+			\label{fig:ex1}
+		\end{subfigure}
+		\begin{subfigure}{.3\textwidth}
+			\includegraphics[width=1\textwidth]{img/cifar-zsd-test379.jpg}
+			\label{fig:ex2}
+		\end{subfigure}
+		\begin{subfigure}{.3\textwidth}
+			\includegraphics[width=1\textwidth]{img/cifar-zsd-test283.jpg}
+			\label{fig:ex3}
+		\end{subfigure}
+		\caption{Ejemplos de imágenes del conjunto de datos CIFAR-ZSD.}
+		\label{fig:CIFAR-ZSD}
+	\end{center}
+\end{figure}
+
+COCO puede resultar pesado en término computacional. Para soluciona esto se creó un conjunto de datos sintético basado en CIFAR-100 datasets, el cual denominamos CIFAR-ZSD. Éste consta de imágenes localizadas, rotadas y re-escalada aleatoriamente con un fondo de otra imagen (algunos ejemplos se pueden ver en la \autoref{fig:CIFAR-ZSD}). Con esto se intenta simular imágenes reales en la cual un objeto puede aparecer con distintos aspectos y escalas. Este conjunto esta dividido para que ninguna instancia de prueba  aparezca en el conjunto de entrenamiento.
+
+Aunque este conjunto resulta muy útil para hacer pruebas de modelos, no es bueno para reportar métricas reales, pero en combinación con COCO, que si lo es, facilita los experimentos a realizar.
+
+
+\subsection{Definición de métricas} \label{ssec:definiciondemetricas}
+Entre los diferentes conjuntos de datos anotados utilizados por los desafíos de detección de objetos y la comunidad científica, la métrica más común utilizada para medir la precisión de las detecciones es el  \textit{Mean Average Precision (mAP)}, seguida por \textit{Recall}. Un dificultad que tienen los modelos de detección a diferencia de los de clasificación, es el calculo de estas métricas ya que no es trivial definirlas. Ademas, no existe una implementación estándar y publica para calcularlas, y aquellas implementaciones públicas están muy encapsuladas en el código, y resulta muy difícil adaptarlo para medir rendimientos de modelos propios. Como ya se mencionó anteriormente, el código de Bansal \etal~\cite{bansal2018zero} no esta disponible, por este motivo fue necesario encontrar alguna implementación de estas métricas. A partir de estas búsqueda se encontraron varias opciones, sin embargo los resultados variaban mucho de un código a otro. Esto se debe a la falta de consenso en diferentes trabajos e implementaciones de AP, que es un problema al que se enfrentan las comunidades académicas, tal como se plantea en artículo de Padilla \etal~\cite{padilla2020survey}. Además, \cite{padilla2020survey} propone una definición y un código para estandarizar las métricas, de manera que se puedan comprar distintos modelos de una forma ``justa''. Por estos motivos decidimos utilizar este trabajo y su implementación para calcular nuestras métricas, aunque los resultados no den exactos a los reportados por Bansal \etal~\cite{bansal2018zero}.\\
+
+Ahora definamos las métricas, basándonos en el trabajo \cite{padilla2020survey}. Primero es necesario definir algunos conceptos:
+\begin{itemize}
+	\item Falso negativo (\textbf{FN}): Para un cuadro delimitador verdadero no se obtuvo ninguna detección en absoluto, o una propuesta tiene IoU $> umbral$ con algún cuadro verdadero y no se predijo correctamente la clase.
+	\item Falso positivo (\textbf{FP}): Una propuesta predijo correctamente la clase de un cuadro delimitador verdadero pero el IoU $< umbral$, o es un predicción duplicada, es decir, ya se marco otra con mayor IoU como \textbf{TP}, o se detecto un objeto inexistente con IoU $< umbral$ para todo cuadro verdadero.
+	\item Verdadero positivo (\textbf{TP}): Una propuesta predijo correctamente la clase y obtuvo un IoU $> umbral$ con algún cuadro verdadero.
+	\item Verdadero negativo (\textbf{TN}): Esto sólo tiene sentido si se quisiera medir propuestas que no tienen un IoU $> umbral$ con todos los cuadros verdaderos, y además se predijo como clase de fondo. Pero en este trabajo no es utilizada.
+\end{itemize}
+El umbral por lo general es 0.5, pero se puede cambiar para exigir que tenga una mayor superposición.\\
+
+La \textit{Recall}, también conocida como exhaustividad, mide la probabilidad de que los objetos anotados en la imagen se detecten correctamente, y viene dado por: 
+
+\begin{equation}
+	\label{eqn:recall}
+	Recall =\frac{TP}{FN+TP}
+\end{equation}
+
+En otras palabras la \textit{recall} contabiliza cuantos objetos se detectaron correctamente de todos los anotados en una imagen.\\
+
+El trabajo de Bansal \etal~\cite{bansal2018zero}, define \textit{Recall} de la siguiente manera: 
+\begin{center}
+	\textit{``Un cuadro delimitador predicho se marca como verdadero positivo solo si tiene una superposición de IoU mayor que un cierto umbral $t$ con un cuadro delimitador existente en la imagen y no se ha asignado ningún otro cuadro delimitador de mayor confianza al mismo cuadro. De lo contrario, se marca como falso positivo.''}\\
+\end{center}
+
+Según esta definición solo se tienen en cuenta los objetos que tuvieron al menos una propuesta con un IoU $> 0.5$, y el resto quedan fuera del cálculo de esta métrica. Esto genera una diferencia enorme entre los resultados calculados con esta definición y con los obtenidos usando la \autoref{eqn:recall}. Con el objetivo de poder comparar los resultados con otros modelos, en este trabajo se calcula \autoref{eqn:recall} de ambas formas. 
+
+Bansal \etal~\cite{bansal2018zero} además calcula una variación denominada \textit{K@Recall}, donde sólo se tienen en cuentan las \textit{K} mejores propuestas basándose en la confianza de la predicción y el resto son descartadas.\\
+
+
+\textit{AP}, es una métrica popular para evaluar la precisión de los detectores de objetos mediante la estimación del área bajo la curva (AUC), que viene dada por la relación de la \textit{precisión} y la \textit{recall}. Donde la precisión consiste en medir el porcentaje de predicciones positivas correctas entre todas las predicciones realizadas y se define como:
+
+\begin{equation} 
+	\label{eqn:precision}
+	Precision =\frac{TP}{FP+TP}
+\end{equation}
+
+
+Para dibujar la curva AUC necesitamos obtener múltiples pares de valores de \textit{precisión} y \textit{recall}, esto se logra cambiando un límite de puntuación. Este limite trata como un falso positivo o todas aquellas propuesta que tengan un puntaje de confianza menor.
+
+Para entender mejor supongamos un limite tal que genera un numero de FP bajo, la \textit{precisión} será alta. Sin embargo, en este caso, se pueden pasar por alto muchos aspectos interesantes de analizar, como por ejemplo un numero de FN alto y por lo tanto una \textit{recall} baja. Pero si uno baja el limite se aceptaran más positivos y la \textit{recall} aumentará, pero el numero FP también puede aumentar, disminuyendo la \textit{precisión}. De esta manera a media que aumentamos la \textit{recall} (bajamos el limite) la \textit{presision} se tiene que mantener alta. Por esto una área alta bajo la curva (AUC) tiende a indicar tanto una alta \textit{recall} como una alta \textit{precisión}.
+
+
+Se define \textit{mAP} para la detección de objetos como el promedio del AP calculado para todas las clases. Por lo general, se indica sobre que IoU se calcula, puede ser un único valor, como por ejemplo mAP@0.5, o un conjunto de umbrales, como \textit{mAP@[x, y]} promediando el valor de \textit{mAP} para cada IoU. El trabajo de Bansal \etal~\cite{bansal2018zero} reporta \textit{mAP}, pero no indica sobre que IoU se calcula, por lo cual se asume que se utilizo un valor de 0,5. Muchos trabajos que utilizan COCO, reportan \textit{mAP@[.5, .95]}. Esta métrica resulta muy útil si se quiere comparar rendimientos entre distintos trabajos.

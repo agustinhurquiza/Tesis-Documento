@@ -1,5 +1,3 @@
-%Plantilla basada en "Template for Masters / Doctoral Thesis" (plantilla disponible en writeLaTex) que subió LaTeXTemplates.com
-
 \documentclass[12pt,twosided]{book}
 \usepackage[paperwidth=17cm, paperheight=22.5cm, bottom=2.5cm, right=2.5cm]{geometry}
 \usepackage{amssymb,amsmath,amsthm} %paquete para símbolo matemáticos
@@ -21,12 +19,10 @@
             pdfkeywords={PALABRAS CLAVE},
             pdfproducer={Latex con hyperref},
             pdfcreator={pdflatex}]{hyperref}
-
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[square,sort,comma,numbers]{natbib}
 
-%\hypersetup{pdfborder = {0 0 0}}
-\graphicspath{{img/}} %En qué carpeta están las imágenes
+\graphicspath{{img/}} % En qué carpeta están las imágenes
 
 \begin{document}
 
@@ -35,13 +31,14 @@
 %----------------------------------------------------------------------------------------
 \newcommand{\etal}{\textit{et al}.}
 \newcommand{\todos}[1]{{\color{red}[TODO: #1]}}
-%Cambiar Cuadros por Tablas y lista de...
+% Cambiar Cuadros por Tablas y lista de...
 \renewcommand{\listtablename}{Índice de tablas}
 \renewcommand{\tablename}{Tabla}
+
 %----------------------------------------------------------------------------------------
 %	PORTADA
 %----------------------------------------------------------------------------------------
-\title{Zero-Shot Object Detection} %Con este nombre se guardará el proyecto en writeLaTex
+\title{Zero-Shot Object Detection} % Con este nombre se guardará el proyecto en writeLaTex
 
 \begin{titlepage}
 \begin{center}
@@ -92,7 +89,6 @@
 
 %----------------------------------------------------------------------------------------
 %	AGRADECIMIENTOS
-
 %----------------------------------------------------------------------------------------
 \chapter*{Agradecimientos}
 A la Universidad Nacional de Córdoba por haberme dado la
@@ -135,11 +131,11 @@ This thesis tackles this problem using deep features and semantic embedding, wit
 
 \include{Capitulos/marco_teorico}
 
-\include{Capitulos/metodologia}
+\include{Capitulos/arquitectura_y_conjunto_de_datos}
 
-\include{Capitulos/analisis_resultados}
+\include{Capitulos/experimentos}
 
-\include{Capitulos/Conclusiones}
+\include{Capitulos/conclusiones}
 
 \thispagestyle{empty}
 
@@ -149,6 +145,6 @@ This thesis tackles this problem using deep features and semantic embedding, wit
 \backmatter
 \nocite{*}
 \bibliographystyle{ieeetr}
-\bibliography{bibliografia.bib} %Aquí ponen el nombre del archivo .bib
+\bibliography{bibliografia.bib} % Aquí ponen el nombre del archivo .bib
 
 \end{document}

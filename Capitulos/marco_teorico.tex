@@ -1,19 +1,77 @@
 \chapter{Marco teórico}\label{cap:marcoteorico}
 
-Para poder entender como funcionan los modelos de ZSD, primero, es necesario comprender como se componen. Por lo general utilizan multimodales, es decir, combinan los espacios semánticos y visuales para poder detectar objetos no vistos. A su ves para poder extraer caracteristicas visuales se necesita utilizar redes neuronales convolucionales y un algoritmo capas de indicar donde hay objetos en una imagen, por otro lado, se requiere un mecanismo para generar las caracteristicas semanticas como por ejemplo Word embedding.
-
-En este capitulo se exponen cada componete que utilizan los modelos de ZSD, como estos se emplean y relacionan.
+En este capitulo se proporciona los antecedentes y detallan los conceptos teóricos en lo que se basa esta tesis. Empezando con la detección de objetos tradicional y sus componentes. Luego, se desarrolla el problema de aprendizaje sin ejemplos y como este se usa en la detección de objetos sin ejemplos. 
 
 \section{El problema de detección de objetos} \label{sec:elproblemadedetcciondeobjetos}
+Con los avances recientes en los modelos de visión por computadora basados en el aprendizaje profundo, las aplicaciones de detección de objetos son más fáciles de desarrollar que nunca. Además de importantes mejoras de rendimiento, estas técnicas también han aprovechado conjuntos de datos de imágenes masivos para reducir la necesidad de generar conjuntos de datos grandes. Con los enfoques actuales que se centran en arquitecturas con un pipeline de extremo a extremo, el rendimiento también ha mejorado significativamente, lo que permite casos de uso en tiempo real.\\
 
 
+La detección de objetos es una importante tarea de visión por computadora, que consiste en localizar la presencia de objetos de determinadas clases como: humanos, automóviles, frutas, o animales, en imágenes digitales. El objetivo de la detección de objetos es desarrollar modelos y técnicas computacionales que proporcionen una de las piezas de información más básicas que necesitan las aplicaciones de visión por computadora: ¿Qué objetos están y dónde? En la \autoref{fig:example_detection}, se muestra un ejemplo de cómo se ve esta clase de algoritmos en la práctica.\\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{ejemplo_detecion_de_objetos.png}
+	\caption{Ejemplo de detección de objetos, el modelo utilizado es Faster R-CNN~\cite{ren2015faster}. Las clases que puede detectar esta implementación son: ``Auto (\textit{car})'',  ``Persona (\textit{person})'',  ``Planta en maceta (\textit{potted plant})'', entre otras.}
+	\label{fig:example_detection}
+\end{figure}
+
+Se puede considerar que la deteeccion de objetos tiene asociado dos sub-problemas:
+
+\begin{itemize}
+	\item \textbf{Localización:} localiza la presencia de un objeto en la imagen y lo representa con un cuadro delimitador (\textit{Bounding box}). Toma una imagen como entrada y muestra la ubicación del cuadro delimitador en algún formato, por ejemplo: (posición, alto y ancho).
+	\item \textbf{Reconocimiento:} tiene como entrada una sub-figura de una imagen (generalmente indicada por un cuadro delimitador) y genera la etiqueta de clase de esa figura con una medida de la confianza, que indica que tan ``buena'' es la predicción. Este problema esta asociado con la clasificación de imágenes, el cual genera una etiqueta y una medida de confianza para una imagen completa.
+\end{itemize}
+
+
+Teniendo en cuenta estos dos componentes, existen principalmente dos tipos de detectores de objetos. Por un lado, tenemos detectores de dos etapas (\textit{two-stage}), como Faster R-CNN~\cite{ren2015faster}, que utilizan una red (\textit{region proposal network}, RPN, por su denominación en inglés) para generar regiones candidatas a contener un objeto de cualquier clase, para luego enviar estas propuestas a una red de reconocimiento. Estos modelos alcanzan las tasas de precisión más altas, pero suelen ser más lentos. Por otro lado, tenemos detectores de una etapa (\textit{one-stage}), como YOLO~\cite{redmon2016you}, que tratan la detección de objetos como un simple problema de regresión, tomando una imagen de entrada y aprendiendo la predicción de clase y coordenadas del cuadro delimitadores en una misma red. Estos últimos, tienen un diseño más eficiente y elegante. 
+
+Los detectores de dos etapas filtran la mayoría de las propuestas negativas, pasando a la etapa de clasificación un numero menor de cuadros, mientras que los detectores de una etapa se enfrentan directamente a todas las regiones de la imagen, reduciendo su desempeño.
+
+En este trabajo nos centraremos en detectores de objetos de dos etapas, la \autoref{fig:OneStage} muestra un ejemplo de como funcionan estos tipos de detectores.\\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{one_stage.png}
+	\caption{Las distintas etapas de un detector de objetos \textit{two-stage}. Imagen adaptada del trabajo Faster R-CNN~\cite{ren2015faster}.}
+	\label{fig:OneStage}
+\end{figure}
+
+\section{Datos de entrenamiento} \label{sec:datosdeentrenamiento}
+Los datos, en general, son un elemento vital de los proyectos de aprendizaje automático supervisado. Cuantos más datos tenga, mejor será el producto final. Sin embargo, no basta con tener datos brutos. Debe tener estos datos anotados, estas anotaciones surgen del proceso de etiquetado que consiste en indicar la ``cosa'' de interés. Dependiendo de los datos y el objetivo final, esta tarea varia. Las etiquetas junto a los datos brutos, ``alimentan'' al algoritmo de aprendizaje automático que luego permiten identificar correctamente los objetos en una imagen, comprender el habla humana y muchas otras funcionalidades. Según algunas estimaciones, el 80\% del tiempo de desarrollo del proyecto de aprendizaje automático se dedica a preparar los datos, y ademas, el costo de esta tarea es muy alta. La razón por la que la anotación de datos es tan importante es que incluso el más mínimo error podría resultar en un modelo deficiente. Esta es una de las áreas en las que los humanos tenemos una ventaja en las computadoras, ya que podemos lidiar mejor con la ambigüedad, descifrar la intención y muchos otros factores que intervienen en la anotación de datos.
+
+Por otro lado, por lo general las anotaciones sufren de un fenómeno denominado ``cola larga'' (o mas conocido como \textit{long tail}). Este fenómeno surge cuando  el número de ejemplos de entrenamiento por clase varía significativamente de miles para las clases principales a tan solo unos pocos para las clases finales. El problema de ``cola larga'' se puede observar en los datos anotados de COCO  \autoref{fig:COCOAnotaciones}, donde la clase persona tiene aproximadamente 260.000 y otras clases como tijeras, oso o parquímetro solo 1000 anotaciones.
+
+En el contexto de la detección de objetos los datos anotados son cuadros delimitadores y sus etiquetas. Una pregunta que siempre se hace es la siguiente: para un modelo de detección de objetos en un problema X, ¿cuántas imágenes se necesitan? La respuesta mas común que se encuentra en la red es 1000 imágenes por clase que se quiere detectar. El origen de este número mágico, proviene del desafío de clasificación de ImageNet original, donde el conjunto de datos tenía, 1000 categorías cada una con 1000 imágenes aproximadamente y por lo general un objeto por imagen. Pero si lo comparamos con un conjunto de datos actual (COCO) donde se evaluá detección de objetos, podemos observar que se requiere muchas mas anotaciones (aproximadamente 10.000 anotaciones en promedio, ver \autoref{fig:COCOAnotaciones}).
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{coco_anotaciones.png}
+	\caption{Numero de anotaciones por clases en el conjunto de datos COCO.}
+	\label{fig:COCOAnotaciones}
+\end{figure}
+
+Esto ejemplos nos pueden orientar un poco, pero aun así dar un numero exacto es difícil, ya que varia mucho dependiendo del problema. Lo que se necesita es un conjunto de imágenes que represente todos los escenarios posibles en el que puede aparecer el objeto que se quiere detectar. Conseguir este conjunto puede que resulte muy difícil, ya sea por el costo que conlleva generar esas anotaciones, por que los escenarios donde aparece el objeto son demasiados, o por que simplemente es complicado conseguir una imagen del objeto.\\
+
+Por estos motivos es necesario encontrar algún método que reduzca el numero de anotaciones necesarias para la detección de objetos. Es así como nacen los métodos denominados ``Aprendizaje sin ejemplos'', los cuales analizaremos a continuación.
+ 
 \section{Aprendizaje sin ejemplos} \label{sec:aprendizajesinejemplos}
-ZSL es un conjunto de problemas de aprendizaje automático, donde en el momento de la prueba, se observan muestras de clases que no se observaron durante el entrenamiento y se necesita predecir la categoría a la que pertenecen. Esta se diferencia de las configuraciones estándares en el aprendizaje automático, donde se espera que se clasifiquen correctamente las nuevas muestras en las clases que ya se han observado durante el entrenamiento.
-Podemos diferenciar dos tipos de clases, las vistas que están presente en el entrenamiento y las invisibles o novedosas que no estuvieron en el mismo. Se debe proporcionar algún tipo de información complementaria sobre estas clases invisibles, este tipo de dato puede ser variado. Como por ejemplo, una descripción estructurada predefinida, que al tenerla en cuenta mejora el aprendizaje, o una descripción textual, donde las clases van acompañadas de un comentario en lenguaje natural, etc. Por último, tanto las clases visibles como las invisibles están relacionadas en un espacio vectorial, donde el conocimiento de las clases vistas se puede transferir a clases invisibles.\\
+El Aprendizaje sin ejemplos (ZSL, por su denominación en inglés \textit{Zero-shot Learning}), es un conjunto de problemas de aprendizaje automático, donde en el momento de la prueba, se observan muestras de clases que no se observaron durante el entrenamiento y se necesita predecir la categoría a la que pertenecen. Esta se diferencia de las configuraciones estándares en el aprendizaje automático, donde se espera que se clasifiquen correctamente las nuevas muestras en las clases que ya se han observado durante el entrenamiento. 
 
-Para poder entender mejor como funciona ZSL, supongamos que queremos detectar un animal en extinción para poder rastrearlos y tener una forma de contabilizarlos, por ejemplo el yaguareté que habita el Chaco Argentino. Poder conseguir un conjunto considerable de fotos del mismo en distintos entornos, situaciones y ubicaciones, como de día, noche, corriendo, descansando, etc. puede resultar un gran desafió y demasiado tarde si nos lleva mucho tiempo. Pero se puede proponer un modelo de ZSL, entrenado con  imágenes de animales similares como leopardo, puma, tigre, etc. y reforzar el entrenamiento con algunas imagenes de yaguareté. \textcolor{red}{/* ToDo: Como formalizar el ejemplo?*/}\\
+Esta técnica se puede aplicar en problemas de visión por computadora, algunos escenarios en el que se puede utilizar son:
 
-El problema de zero-shot learning se puede dividir en categorías según los datos presentes durante la fase de entrenamiento y la fase de prueba:
+\begin{itemize}
+	\item \textbf{El número de clases objetivo es grande:} Generalmente, los seres humanos pueden reconocer una gran cantidad de clases. Sin embargo, recopilar suficientes instancias etiquetadas para un número tan grande de clases es un desafío.
+	
+	\item \textbf{Las clases objetivo son raras:} Supongamos que queremos reconocer flores de diferentes razas. Es difícil recopilar suficientes instancias de imágenes para todas las razas. Ademas, para muchas flores raras, no podemos encontrar las instancias etiquetadas correspondientes.
+	
+	\item \textbf{Las clases objetivo cambian con el tiempo:} Un ejemplo es reconocer imágenes de productos pertenecientes a cierto estilo o marca. Dado que los estilos y marcas cambian con frecuencia, para algunos productos nuevos, es difícil encontrar los casos etiquetados correspondientes.
+	
+	\item \textbf{El costo de obtener instancias etiquetadas:} El proceso de etiquetado de instancias es caro y requiere mucho tiempo. Por ejemplo, supongamos que queremos detectar un animal en extinción para poder rastrearlos y tener una forma de contabilizarlos y proteger las áreas donde se encuentran, por ejemplo el yaguareté que habita el Chaco Argentino. Poder conseguir un conjunto considerable de fotos del mismo en distintos entornos, situaciones y ubicaciones, como de día, noche, corriendo, descansando, etc. puede resultar un gran desafió y demasiado tarde si nos lleva mucho tiempo.
+\end{itemize}
+
+Todos estos problemas se puede intentar solucionar con ZSL, entrenando los modelos con clases similares y luego evaluarlas en las clases que nos interesan. Por ejemplo, para el problema del  yaguareté, se puede proponer un modelo de ZSL, entrenado con imágenes de animales similares como leopardo, puma, chita, etc. y luego utilizar este modelo para detectar el yaguareté.\\
+ 
+Es necesario entender que en este tipo de configuración, existen dos tipos de clases. Las vistas, que son todas aquellas que tienen al menos una instancia en los datos de entretenimiento y las invisibles que no tienen ninguna instancia en los datos de entrenamiento. Dicho esto el aprendizaje sin ejemplos se puede dividir en categorías según los datos presentes durante la fase de entrenamiento y la fase de prueba:
 \begin{itemize}
 	\item En base a los datos disponibles en el momento de entrenar un modelo.
 	\begin{itemize}
@@ -27,10 +85,80 @@ El problema de zero-shot learning se puede dividir en categorías según los dat
 	\end{itemize}
 \end{itemize}
 
-\section{Detección de objetos sin ejemplos} \label{sec:detecciondeobjetossinejemplo}
-Zero-shot object detection, tiene como objetivo reconocer y localizar simultáneamente instancias de objetos que pertenecen a categorías novedosas sin ningún ejemplo de entrenamiento. Como estas categorías no están presente en el entrenamiento, no se tiene ninguna información sobre su aspecto visual, lo cual no nos permite detectarlas ni reconocerlas. Por lo tanto, es necesario encontrar algún dominio que tenga la capacidad de guardar la información de todas las clases, para luego relacionarlas con el aspecto visual de las categorías novedosas.\\
+En el aprendizaje sin ejemplo, no se tiene información sobre las clases de test. La forma de suplir la falta de esa información sobre las clases que se quiere predecir, es utilizar otro espacio que pueda representar tanto las clases vista y las invisibles. Para poder generar ese espacio, se necesita algún tipo de información auxiliar, que pueda representar todas las clases.
+Algunos ejemplos de información auxiliar son, una estructura de clases, una descripción textual en lenguaje natural, etc. La \autoref{fig:modales} muestra algunos tipos de información subsidiaria para un mismo dato de entrada.
 
-Este trabajo se basa en el artículo científico de Bansal \etal ~\cite{bansal2018zero}, además utiliza muchos conceptos sobre zero-shot learning generalizado~\cite{zero-shot-generalizado}. Se propone un modelo zero-shot  inductivo, es decir, solo se observan imágenes de clases vistas y etiquetas que indican a que clase pertenece. Estas etiquetas son palabras del lenguaje natural sin ninguna estructura. Luego, se puede inferir todas las clases o solo las invisibles, dependiendo de si se quiere evaluar aprendizaje por zero-shot  generalizado o convencional, respectivamente.\\ 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/modales.png}
+	\caption{Idealización de distintos tipos de información subsidiaria con sus respectivos espacios.}
+	\label{fig:modales}
+\end{figure}
+
+En obras existentes, el enfoque de información auxiliar se inspira en la forma en que los seres humanos reconocen el mundo. Los seres humanos pueden realizar un aprendizaje sin ejemplo con la ayuda de algunos conocimientos semánticos. Por ejemplo, con el conocimiento de que ``una cebra se parece a un caballo y tiene rayas'', podemos reconocer una cebra incluso sin haberla visto antes, siempre que sepamos cómo es un caballo y cómo se ve el patrón rayas. De esta manera, la información auxiliar involucrada por los métodos de aprendizaje sin ejemplos existentes suele ser información semántica que forman un espacio que contiene tanto las clases visibles como las invisibles.\\
+
+Esta técnica de utilizar dos tipos de información, semántica y visual se denomina multimodales. La modalidad se refiere a la forma en que algo sucede o se experimenta. Un problema de investigación se caracteriza como multimodal cuando incluye datos de distinta naturaleza. La \autoref{fig:EjemploZSD} muestra un ejemplo de como funciona un clasificador sin ejemplos usando multimodales, transformando las imágenes a un espacio que representa las clases.\\
+
+A continuación se detalla como se puede procesar y representar los dos tipos de información utilizado en este trabajo, visuales y semánticos.
+
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/Modelo.png}
+	\caption{Descripción de como funciona un clasificador de imágenes usando aprendizaje sin ejemplo. ``Auto'', ``Camión'', ``Perro'' y ``Tigre'' se observan  durante el entrenamiento,  ``Gato'' y ``Camioneta'' son clases invisibles. El formato de las imágenes sufren una transformación y se mapean a un espacio donde se contiene la información de todas las clases. Este mapeo agrupa distintas imágenes de una clase en espacios cercanos y mientras mas distinta es la clase mas alejadas están.}
+	\label{fig:EjemploZSD}
+\end{figure}
+
+
+\subsection{Redes neuronales convolucionales} \label{sec:redesneuronalesconvolucionales}
+Las redes neuronales convolucionales, o CNN por sus siglas en inglés, son un tipo de modelos de aprendizaje profundo (\textit{Deep learning}) utilizadas  para procesar distintos tipos de datos, pero empleadas generalmente en el dominio de las imágenes. Está inspirado en la organización de la corteza visual de los animales, diseñada para aprender de forma automática y adaptativa patrones en jerarquías, de bajo a alto nivel, es decir, de formas simples como cuadrados y círculos a formas mas complejas como autos. Esto quiere decir que las primeras capas pueden detectar lineas, curvas y se van especializando hasta llegar a capas más profundas que reconocen formas complejas como un rostro. Por lo general una red CNN se compone de tres tipos de capas: convolución, agrupación y capas completamente conectadas, como se puede ver en la \autoref{fig:CNNEjemplo}. El rol de cada capa es:
+
+\begin{itemize}
+	\item Convolución: somete los datos de entrada a un conjunto de filtros convolucionales, cada uno de los cuales activa ciertas características de los datos. Generalmente esta acompañada de una capa de activación, que permite un entrenamiento más rápido y eficaz al asignar los valores negativos a cero y mantener los valores positivos, de esta manera permitir que solo las características activadas pasen a la siguiente capa.
+	\item Agrupación: se coloca generalmente después de la capa convolucional. Su utilidad principal radica en la reducción de su entrada para la siguiente capa convolucional, reduciendo así el número de parámetros que la red necesita aprender.
+	\item Capas completamente conectadas: Es la encargada de relacionar los datos de las capas anteriores y generar una salida, que por lo general es utilizada para clasificar los datos de entrada.
+\end{itemize}
+
+
+Algunos ejemplos de redes CNN son: VGG16~\cite{simonyan2014very} (que posee 13 capas de convolución, 5 de agrupación y una totalmente conectada) y AlexNet~\cite{krizhevsky2012imagenet} (que contiene 5 capas convolucionales, 3 capas de agrupación y 3 capas completamente conectadas).\\
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/red_cnn.png}
+	\caption{Una arquitectura simplificada de una red neuronal convolucional.}
+	\label{fig:CNNEjemplo}
+\end{figure}
+
+\subsection{Vectores de palabras (Word embedding)} \label{sec:wordembedding}
+Así como en las imágenes utilizamos las redes CNN, para obtener un vector que represente a la misma, es necesario un procedimiento para representar clases de interés con algún objeto matemático. Hay muchas formas de representar palabras, la más usada son los \textit{word embedding}. Esta es una técnica de aprendizaje en el campo de procesamiento del lenguaje natural (PLN), capaz de capturar el contexto de una palabra en un documento, calcular similitud semántica y sintáctica con otras palabras.\\
+
+Para entender como funcionan, consideremos las oraciones con un significado similar: ``Que tengas un buen día.'' y ``Que tengas un gran día.''. Si construimos un vocabulario exhaustivo:
+\[ V = \{que, tengas, un, buen, gran, dia\}. \]
+A partir de esto, se puede crear un vector codificado para cada una de estas palabras, en donde cada vector tenga el tamaño de $V$, cuyos componentes sean todos 0 excepto por el elemento en el índice que representa la palabra correspondiente en el vocabulario, que contiene un 1. Esta representación no resulta conveniente ya que la distancia entre \textit{gran} y \textit{buen} es la misma que entre \textit{tengas} y \textit{buen}.  El objetivo es que las palabras con un contexto similar ocupen posiciones espaciales cercanas. Para lograr esto, se introduce cierta dependencia de una palabra con las otras.\\
+
+Word2Vec~\cite{mikolov2013distributed} desarrollado por Tomas Mikolov en 2013. Es un modelo particularmente eficiente desde el punto de vista computacional. Este modelo se encuentra disponible de dos formas: \textit{Continuous Bag-of-Words} (CBOW) o el modelo \textit{Skip-Gram}. En CBOW, las representaciones distribuidas de contexto (o palabras circundantes) se combinan para predecir la palabra en el medio. En nuestro ejemplo \textit{gran} y \textit{buen} están rodeado de un contexto similar por lo cual resultan en vectores similares. Es varias veces más rápido de entrenar que el \textit{Skip-gram}, y tiene una precisión ligeramente mejor para las palabras frecuentes. Mientras que en el modelo \textit{Skip-gram}, la representación distribuida de la palabra de entrada se usa para predecir el contexto. Se entrena con una tarea falsa que, dada una palabra, intenta predecir las palabras vecinas. En realidad, el objetivo es solo aprender los pesos de la capa oculta que corresponden a los vectores de palabras que estamos tratando de aprender. Por ejemplo, \textit{Gran} se entrena para predecir el contexto \textit{un} y  \textit{día}, al igual que \textit{buen}. Funciona bien con una pequeña cantidad de datos de entrenamiento.
+
+Los modelos de ZSL, aprovechan la capacidad de capturar similitudes semántica que tiene \textit{word embedding}, para relacionar las clases vistas con las clases invisibles.\\
+
+
+
+\section{Detección de objetos sin ejemplos} \label{sec:detecciondeobjetossinejemplo}
+
+\subsection{Introducción} 
+El aprendizaje sin ejemplos identifica objetos invisibles para los que no hay imágenes de entrenamiento disponibles. Los enfoques de ZSL convencionales están restringidos a una configuración de reconocimiento donde cada imagen de prueba se clasifica en una de varias clases de objetos invisibles. Esta configuración no es adecuada para aplicaciones del mundo real donde los objetos invisibles aparecen como parte de una escena completa. Para abordar esta limitación, aparece una nueva configuración, la detección de objetos sin ejemplos (ZSD) por sus siglas en ingles \textit{Zero-shot Object Detection}, que tiene como objetivo reconocer y localizar simultáneamente instancias de objetos, incluso en ausencia de ejemplos visuales de esas clases durante la fase de entrenamiento.\\
+
+Se podría considerar que un modelo de detección de objetos sin ejemplos, es un modelo de ZSL pero con un paso extra, ubicar todas las instancias de objetos que aparecen en una imagen. Este paso se denomina propuesta de objetos y tiene que ser capas de diferenciar fondos y generar una lista con cuadros delimitadores con posibilidad de contener algún objeto. Un algoritmo de localización de objetos generará las coordenadas de la ubicación de los objetos con respecto a la imagen. En visión artificial, la forma más popular de representar la ubicación de los objetos es con la ayuda de cuadros delimitadores (\textit{Bounding Boxes}). Existen muchos algoritmos y redes que intenta resolver este problema, algunos ejemplos son ventana deslizante (\textit{slide window}), Edge-Boxes~\cite{zitnick2014edge} y búsqueda selectiva (\textit{selective search})~\cite{uijlings2013selective}. En ZSD la propuesta de objetos cumple un papel importante, ya que se necesita extraer todas las instancias de los objetos, pero también tiene que discriminar fondos como cielo, ciudades, veredas, etc.\\ 
+
+\begin{figure}[]
+	\centering
+	\includegraphics[width=1\textwidth]{img/NMS.png}
+	\caption{Salida de un generador de propuesta de objetos y el resultado después de  usar NMS.}
+	\label{fig:NMS}
+\end{figure}
+
+Como veremos en el \autoref{cap:experimentos} se experimentó con Edge-Boxes~\cite{zitnick2014edge} y \textit{selective search})~\cite{uijlings2013selective}, ya que estos generan una cantidad de propuestas significativamente menor a algoritmos del estilo de ventana deslizante. Esto se debe a que no recorren toda la imagen generando distintos cuadros para distinto tamaños, si no que extraen algún tipo de información de la imagen y generan los cuadros basándose en dicha información, refinando y reduciendo el numero de cuadros. Para el caso de Edge-Boxes~\cite{zitnick2014edge} utiliza un método para generar propuestas de cuadro delimitador utilizando bordes, que proporcionan una representación escasa pero informativa de una imagen. La principal observación es que el número de contornos que están totalmente contenidos en un cuadro delimitador es indicativo de la probabilidad de que el cuadro contenga un objeto. De esta maneara con 1.000 cuadros pueden detectar hasta el 90\% de los objetos. Por otro lado \textit{selective search})~\cite{uijlings2013selective} combina la fuerza de una búsqueda exhaustiva y la de segmentación, que agrupa los pixeles en segmentos, ya sea por color, por texturas, etc. Este algoritmo genera aproximadamente 10.000 propuestas que detecta hasta el 99\% de los objetos.
+
+Pero aun así Edge-Boxes~\cite{zitnick2014edge} y \textit{selective search})~\cite{uijlings2013selective}, siguen generando una cantidad considerable de cuadros (del orden de los miles) y ademas, muchos cuadros con una gran superposición. Esto da lugar a una técnica de refinamiento denominada supresión de no máximos (NMS), ejemplificada en la~\autoref{fig:NMS}. La salida de NMS es un conjunto más reducido de propuestas, en la cual se filtraron todas las que se consideran repetidas y retorna solo las más representativa.\\
 
 El requisito estricto de no utilizar ninguna imagen de clase invisible durante el entrenamiento es una condición difícil. Además, existen otras dificultades en la tarea de ZSD relacionadas al conjunto de datos de entrenamiento y prueba, es decir entre las clases vistas e invisibles. Estas dificultades son:
 
@@ -44,111 +172,31 @@ El requisito estricto de no utilizar ninguna imagen de clase invisible durante e
 	\item \textbf{Ruido en el espacio semántico}: cuando se utiliza los vectores de incrustación semántica no supervisados como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}, las embeddings resultante en general son ruidosas, ya que se generan automáticamente a partir de la minería de texto no anotado. Esto también afecta significativamente el rendimiento de ZSD.
 \end{itemize}
 
-Existen algunas variaciones de ZSD que intentan atenuar estos problemas, agrupando las clases en grupos o metaclases. Estas variaciones son: 
+\subsection{Trabajos recientes en ZSD} \label{ssec:trabajosrecientesenzsd}
 
-\begin{itemize}
-	
-	\item \textbf{Zero-shot metaclass detection (ZSMD)}, que dada una imagen de prueba, el objetivo es localizar cada instancia de una clase de objeto invisible y categorizarla en una de las superclases.
-	
-	\item \textbf{Zero-shot tagging (ZST)}, consiste en reconocer una o más clases invisibles en una imagen de prueba, sin identificar su ubicación.
-	
-	\item \textbf{Zero-shot metaclass tagging (ZSMT)}, reconoce una o más metaclases en una imagen de prueba, sin identificar su ubicación.
-	
-\end{itemize}
+Existen muchas técnicas propuestas para resolver ZSD. Cuando se empezó a leer sobre este tema a fines del 2018, la más utilizada consistía en crear una combinación de aspectos visuales y semánticos de cada objeto. Puntualmente existían tres trabajos en paralelos con una metodología similar. Bansal \etal~\cite{bansal2018zero} propuso un enfoque basado en características donde las propuestas de objetos se generan mediante edge-box. Zhu \etal~\cite{zhu2018zero} propone un método basado en el detector YOLO~\cite{redmon2016you}. Rahman \etal~\cite{rahman2018zero} propuso una extensión de Faster R-CNN~\cite{ren2015faster} junto a un nuevo enfoque transductivo para asociar objetos novedosos en el espacio semántico.\\
 
-Estas tareas son atractivas a la hora de calcular métricas, pero no para ser aplicadas a problemas reales.
+En los últimos dos años se publicaron nuevos trabajos utilizando esta técnica. Rahman \etal~\cite{rahman2020zero} que mejora los modelos y resultados de su trabajo previo~\cite{rahman2018zero}. Gupta \etal~\cite{gupta2020multi} donde combina predicciones obtenidas en dos espacios de búsqueda diferentes, es decir, del espacio semántico al visual y viceversa. Rahman \etal~\cite{rahman2020improved} proponen  una función de pérdida novedosa que maneja el desequilibrio de clases y busca alinear adecuadamente los vectores visuales y semánticos.
 
+Este trabajo se basa en el artículo científico de Bansal \etal ~\cite{bansal2018zero}, además utiliza muchos conceptos sobre zero-shot learning generalizado~\cite{zero-shot-generalizado}. Se propone un modelo zero-shot  inductivo, es decir, solo se observan imágenes de clases vistas y etiquetas que indican a que clase pertenece. Estas etiquetas son palabras del lenguaje natural sin ninguna estructura. Luego, se puede inferir todas las clases o solo las invisibles, dependiendo de si se quiere evaluar aprendizaje por zero-shot  generalizado o convencional, respectivamente.\\ 
 
-\section{Redes neuronales convolucionales} \label{sec:redesneuronalesconvolucionales}
-Las redes neuronales convolucionales, o CNN por sus siglas en inglés, son un tipo de modelos de aprendizaje profundo (\textit{Deep learning}) utilizadas  para procesar distintos tipos de datos, pero empleadas generalmente en el dominio de las imágenes. Está inspirado en la organización de la corteza visual de los animales, diseñada para aprender de forma automática y adaptativa patrones en jerarquías, de bajo a alto nivel. Esto quiere decir que las primeras capas pueden detectar lineas, curvas y se van especializando hasta llegar a capas más profundas que reconocen formas complejas como un rostro. Por lo genera una red CNN se compone de tres tipos de capas: convolución, agrupación y capas completamente conectadas, como se puede ver en la \autoref{fig:CNNEjemplo}. El rol de cada capa es:
+\subsection{Formalización de ZSD} \label{ssec:formalizaciondezsd}
+Para formalizar ZSD denotamos el conjunto de las clases como $\mathcal{C} = \mathcal{S} \cup \mathcal{U}$, donde $\mathcal{S}$ son las clases vistas para entrenamiento y $\mathcal{U}$ las clases no vistas, utilizadas en la etapa de pruebas. Además se tiene que $\mathcal{S} \cap \mathcal{U} = \emptyset$. Aunque no es necesario definir el conjunto de clases de pruebas, ya que el modelo tiene que ser capás de detectar tanto clases vista como las no vista, esto se hace para poder tener una evaluación cuantitativa.
 
-\begin{itemize}
-	\item Convolución: somete los datos de entrada a un conjunto de filtros convolucionales, cada uno de los cuales activa ciertas características de los datos. Generalmente esta acompañada de una capa de activación, que permite un entrenamiento más rápido y eficaz al asignar los valores negativos a cero y mantener los valores positivos, de esta manera permitir que solo las características activadas pasen a la siguiente capa.
-	\item Agrupación: se coloca generalmente después de la capa convolucional. Su utilidad principal radica en la reducción de su entrada para la siguiente capa convolucional, reduciendo así el número de parámetros que la red necesita aprender.
-	\item Capas completamente conectadas: Es la encargada de relacionar los datos de las capas anteriores y generar una salida, que por lo general es utilizada para clasificar los datos de entrada.
-\end{itemize}
+Denotamos a una imagen como $\mathcal{I} \in \mathbb{D}^{\mathcal{H} \times \mathcal{W} \times 3}$. Donde $\mathbb{D} = \{0,...,255\}$, $\mathcal{H}$  es el largo de la imagen, $\mathcal{W}$ el ancho. Esta es la forma en la que se representa cada pixel de la imagen en el formato \textbf{RGB}, donde se tiene 3 canales que caracterizan la intensidad de los colores rojo, verde y azul. 
 
+Por cada imagen se provee un conjunto de cuadros delimitadores $\mathbb{B} = \{b_0,...,b_k\mid b_i \in N^4\}$ (cada $b_i$ representa las coordenadas de un cuadro) y sus etiquetas asociadas como $\mathbb{Y} = \{y_0,...,y_k\mid y_i \in \mathcal{C}\}$. Para cada cuadro delimitador $b_i$ extraemos una característica profunda utilizando una red neuronal convolucional denotada como $\phi(b_i) \in \mathbb{R}^{D_1}$. 
 
-Algunos ejemplos de redes CNN son: VGG16~\cite{simonyan2014very} (que posee 13 capas de convolución, 5 de agrupación y una totalmente conectada) y AlexNet~\cite{krizhevsky2012imagenet} (que contiene 5 capas convolucionales, 3 capas de agrupación y 3 capas completamente conectadas).\\
+Denotamos las incrustaciones semánticas $w_j \in \mathbb{R}^{D_2}$ obtenido por algún modelo como Word2Vec~\cite{mikolov2013distributed}. El conjunto de todas las imágenes de entrenamiento se indica con $\mathcal{X}^s$, que contiene ejemplos de todas las clases de objetos visibles.  El conjunto de todas las imágenes de prueba que contienen muestras de clases de objetos invisibles se indica con  $\mathcal{X}^u$. En particular, no hay ningún objeto de clase invisible en $\mathcal{X}^s$, pero $\mathcal{X}^u$ puede contener objetos vistos.\\
 
-Estas redes son fundamentales para un modelo de detección de objeto y por lo tan tanto para ZSD. Debido a que las CNN son muy eficaces reconociendo patrones, si dos imágenes tienen un aspecto similar, los vectores también tendrán una semejanza. Esta es la forma que tenemos en este trabajo de relacionar los aspectos visuales de las clases vista e invisibles. Por ejemplo, supongamos un lavarropa y un lavavajilla que tienen un aspecto similar, donde la primera es una clase visible y la segunda es invisible, gracias a que las CNN generan vectores muy parecidos se puede obtener la información de que estas clases son similares sin a ver visto antes un lavavajilla. Por lo general se elimina la capa totalmente conectada y se utiliza la salida de la etapa previa como un vector de las caracteristicas visuales.
+El objetivo es encontrar una matriz de proyección $W_p$, tal que 
+\[ \psi_i = W_p\phi(b_i) \:\:\:,\:\:\: W_P \in \mathbb{R}^{D_2 \times D_1},\:\:\: \psi_i \in \mathbb{R}^{D_2} \] 
+Note que $\psi_i$ y las incrustaciones semánticas se encuentran en el mismo dominio. Como mencionamos en secciones anteriores, el espacio vectorial semántico, tiene una gran capacidad de capturar similitudes semánticas. Por lo cual, resulta clave encontrar una matriz que para cada cuadro delimitador se proyecte lo más cerca posible a la incrustación semántica de su clase. 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\textwidth]{img/red_cnn.png}
-	\caption{Una arquitectura simplificada de una red neuronal convolucional.}
-	\label{fig:CNNEjemplo}
-\end{figure}
+El resultado es una función 
+\[f : \mathcal{X}, W_p  \to \{y_0,...,y_k\mid y_i \in \mathcal{C}\} \quad \operatorname{con}\quad \mathcal{X} =  \mathcal{X}^s \cup \mathcal{X}^u\] 
+con un riesgo empírico regularizado mínimo $\mathcal{R}$ definido de la siguiente manera: 
+\[ \arg_{}\min_{f \in F} \mathcal{R}(f(x,W_p))\quad, \] 
+donde $x \in \mathcal{X}^s$ durante el entrenamiento. La función de mapeo utilizada en la etapa de inferencia, tiene la siguiente forma \[ f(x,W_p) = \arg_{}\max_{y \in \mathcal{C}}\max_{b \in \mathbb{B}(x)} (F(x,y,b,W_p)) \quad,\] donde los $\mathbb{B}(x)$ es el conjunto de propuestas de la imagen $x$. Intuitivamente se buscan los cuadros delimitadores de mejor puntuación y se les asigna la categoría de objeto de puntuación máxima.\\
 
-\section{Word embedding} \label{sec:wordembedding}
-Así como en las imágenes utilizamos las redes CNN, para obtener un vector que represente a la misma, es necesario un procedimiento para representar palabras con algún objeto matemático. Hay muchas formas de representar palabras, la más usada son los \textit{word embedding}. Esta es una técnica de aprendizaje en el campo de procesamiento del lenguaje natural (PLN), capaz de capturar el contexto de una palabra en un documento, calcular similitud semántica y sintáctica con otras palabras.\\
-
-Para entender como funcionan, consideremos las oraciones con un significado similar: ``Que tengas un buen día.'' y ``Que tengas un gran día.''. Si construimos un vocabulario exhaustivo:
- \[ V = \{que, tengas, un, buen, gran, dia\}. \]
-A partir de esto, se puede crear un vector codificado para cada una de estas palabras, en donde cada vector tenga el tamaño de $V$, cuyos componentes sean todos 0 excepto por el elemento en el índice que representa la palabra correspondiente en el vocabulario, que contiene un 1. Esta representación no resulta conveniente ya que la distancia entre \textit{gran} y \textit{buen} es la misma que entre \textit{tengas} y \textit{buen}.  El objetivo es que las palabras con un contexto similar ocupen posiciones espaciales cercanas. Para lograr esto, se introduce cierta dependencia de una palabra con las otras.\\
-
-Word2Vec~\cite{mikolov2013distributed} desarrollado por Tomas Mikolov en 2013. Es un modelo particularmente eficiente desde el punto de vista computacional. Este modelo se encuentra disponible de dos formas: \textit{Continuous Bag-of-Words} (CBOW) o el modelo \textit{Skip-Gram}. En CBOW, las representaciones distribuidas de contexto (o palabras circundantes) se combinan para predecir la palabra en el medio. En nuestro ejemplo \textit{gran} y \textit{buen} están rodeado de un contexto similar por lo cual resultan en vectores similares. Es varias veces más rápido de entrenar que el \textit{Skip-gram}, y tiene una precisión ligeramente mejor para las palabras frecuentes. Mientras que en el modelo \textit{Skip-gram}, la representación distribuida de la palabra de entrada se usa para predecir el contexto. Se entrena con una tarea falsa que, dada una palabra, intenta predecir las palabras vecinas. En realidad, el objetivo es solo aprender los pesos de la capa oculta que corresponden a los vectores de palabras que estamos tratando de aprender. Por ejemplo, \textit{Gran} se entrena para predecir el contexto \textit{un} y  \textit{día}, al igual que \textit{buen}. Funciona bien con una pequeña cantidad de datos de entrenamiento.
-
-En este trabajo, aprovechamos la capacidad de capturar similitudes semántica que tiene \textit{word embedding}, para relacionar las clases vistas con las clases invisibles.\\
-
-
-\section{Propuesta de objetos} \label{sec:propuestadeobjetos}
-En problemas de detección de objetos, generalmente se tiene que encontrar todos los objetos posibles en la imagen. La localización de objetos se refiere a identificar la ubicación de uno o varios objetos en la imagen. Un algoritmo de localización de objetos generará las coordenadas de la ubicación de los objetos con respecto a la imagen. En visión artificial, la forma más popular de representar la ubicación de los objetos es con la ayuda de cuadros delimitadores (\textit{Bounding Boxes}). Existen muchos algoritmos y redes que intenta resolver este problema, algunos ejemplos son ventana deslizante (\textit{slide window}), Edge-Boxes~\cite{zitnick2014edge} y búsqueda selectiva (\textit{selective search})~\cite{uijlings2013selective}. En ZSD la propuesta de objetos cumple un papel importante, ya que se necesita extraer todas las instancias de los objetos, pero también tiene que discriminar fondos como cielo, ciudades, veredas, etc.\\
-
-En este proyecto, como veremos en el \autoref{cap:experimentos} se experimentó con Edge-Boxes y \textit{selective search}, ya que estas generan una cantidad de propuestas significativamente menor a algoritmos del estilo de ventana deslizante. Aun así, procesar todas estas propuestas es engorroso. Adamas, estos modelos por lo general dan como resultados muchos cuadros con una gran superposición. Esto da lugar a una técnica denominada supresión de no máximos (NMS), ejemplificada en la~\autoref{fig:NMS}. Este algoritmo necesita de un puntaje que indica la confianza del cuadro delimitador y un criterio para comparar entre distintos cuadros. El criterio más común es Intersección sobre Unión (IoU), en la~\autoref{fig:IoU} se muestra como se calcula sobre dos \textit{Bounding Boxes}. La salida de NMS es un conjunto más reducido de propuestas, en la cual se filtraron todas las que se consideran repetidas y retorna solo las más representativa. A continuación se muestra el pseudocódigo de NMS.
-
-\begin{center}
-\noindent\fbox{
-	\begin{minipage}{1\textwidth}
-		\begin{algorithmic}[1]
-			\Procedure{NMS}{B, S, t}
-				\State{D = $\emptyset$ }
-				\For {B $\neq \emptyset$ }
-					\State{$b_i$ = \textbf{SelPropuestaMaxPuntaje}(B, S)}
-					\State{\textbf{Eliminar}($b_i$, B)}
-					\For {$b_j$ $\in$ B}
-						\If {\textbf{IoU}($b_i$, $b_j$) $>$ t}
-							\State{\textbf{Eliminar}($b_j$, B)}
-						\EndIf
-					\EndFor				
-				\EndFor
-			\State{\Return {D}}
-			\EndProcedure
-		\end{algorithmic}
-	\end{minipage}
-}
-\end{center}
-
-\begin{figure}[]
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[width=0.7\textwidth]{img/iou.png}
-		\caption{IoU}
-		\label{fig:IoU}
-	\end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[width=1.1\textwidth]{img/NMS.png}
-		\caption{Supresión de no máximos}
-		\label{fig:NMS}
-	\end{subfigure}
-	\caption{(a) Calculo de Intersección sobre Unión. (b) Salida de la propuesta de objetos y el resultado después de NMS.}
-		\label{fig:RP}
-\end{figure}
-
-\section{Multimodales} \label{sec:multimodales}
-
-Nuestra experiencia del mundo es multimodal, vemos objetos y sus entornos, escuchamos música y ruidos, sentimos la textura de los distintos materiales, etc.  Inconscientemente asociamos una situación a los distintos estímulos que recibimos en ese momento y los relacionamos entre si, para genera una idea de lo que esta sucediendo. De esta manera, sabemos que si algo huele mal, lo más probable es que sepa igual, o podemos relacionar una imagen del campo con el sonido de los pájaros.\\
-
-La modalidad se refiere a la forma en que algo sucede o se experimenta. Un problema de investigación se caracteriza como multimodal cuando incluye datos de distinta naturaleza. Para que la inteligencia artificial avance en la comprensión del mundo que nos rodea, necesita poder interpretar y relacionar estas distintas señales. Si bien la combinación de diferentes modalidades para mejorar el rendimiento parece una tarea ``atractiva'', en la práctica, es un desafío, ya que una ineducada combinación de distintos tipos de información, puede generar confusión y conflictos. 
-
-La idea general es, a partir de dos objetos matemáticos distintos, uno de cada modal, poder transformarlos para lograr que pertenezcan a un tercer objeto que corresponde a la representación multimodal. Las imágenes suelen estar asociadas con etiquetas y explicaciones de texto. En este trabajo nos aprovechamos de esto y tratamos de encontrar un espacio común entre el vector que representan a la imagen del objeto y el que representa la sintaxis de la clase.
-
-La idea de multimodales es utilizar un espacio compartido entre las representaciones de visión y del lenguaje. Para lograr esto, se utiliza  \textbf{Words embeddings} y \textbf{vectores con representaciones visuales}. Las primeras asignan a palabras una representación vectorial continua. Estos vectores se utilizan para medir similitudes semánticas y sintácticas entre palabras. Entre los modelos más famosos se encuentran Glove~\cite{pennington-etal-2014-glove} y Word2vec~\cite{mikolov2013efficient}. Por otro lado, para obtener los vectores visuales de una imagen se utilizan redes profundas. Entre los mejores modelos se encuentran VGG~\cite{simonyan2014very}, ResNet~\cite{resnet} e Inception~\cite{Szegedy_2015_CVPR}. La~\autoref{fig:EjemploZSD} describe como se utiliza la combinación de vectores de palabras y visuales para inferir un objetos nunca antes vistos por el modelo.\\
-
-\begin{figure}[]
-	\centering
-	\includegraphics[width=0.7\textwidth]{img/Modelo.png}
-	\caption{Descripción de la tarea de detección de objetos por disparo cero utilizando multimodales, donde los objetos ``Auto'', ``Camión'', ``Perro'' y ``Tigre'' se observan  durante el entrenamiento,  ``Gato'' y ``Camioneta'' son clases invisibles. El enfoque localiza estas clases no vistas aprovechando las relaciones del espacio semántico.}
-	\label{fig:EjemploZSD}
-\end{figure}
+Ahora que tenemos una idea general del problema de ZSD y como se define formalmente, podemos proponer una arquitectura para resolver este problema, ademas de como y donde se puede evaluar dicha arquitectura.

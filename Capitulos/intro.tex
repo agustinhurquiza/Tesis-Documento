@@ -1,9 +1,9 @@
 \chapter{Introducción y Motivación} \label{cap:intro}
 
-\section{Detectores y ZSD} \label{sec:detectoresyzsd}
-La detección de objetos estudia cómo detectar la presencia de objetos en una imagen. Esta es una de las áreas de visión por computadora de mayor crecimiento en los últimos años. Si bien es un problema conocido y estudiado desde hace tiempo, recién en la ultima década sus modelos se volvieron mas complejos y eficaces, debido a la aparición de técnicas  de ``Deep Learning''. Sin embargo estos modelos tienen un gran inconveniente, necesitan de un conjunto excesivamente grande de datos anotados para su entrenamiento. Conseguir un gran numero de anotaciones, pude resultar un gran desafió, ya sea por la naturaliza del problema o por los grandes costo que esto conlleva. A esto se le suma la complejidad del problema en si, es decir, poder detectar todas las instancias de todos los posibles objetos en una imagen. Esto motivo a la aparición de métodos como ZSD, que intenten mitigar estas dificultades reduciendo el numero de anotaciones necesarias. Por otro lado existen otras áreas de la visión por computadora, como la clasificación, que reducen considerablemente la dificultad del problema, pero se aplican a escenarios menos realista a los de ZSD.
+\section{Introducción} \label{sec:introduccion}
+La detección de objetos estudia cómo detectar la presencia de objetos en una imagen. Esta es una de las áreas de visión por computadora de mayor crecimiento en los últimos años. Si bien es un problema conocido y estudiado desde hace tiempo, recién en la ultima década sus modelos se volvieron mas complejos y eficaces, debido a la aparición de técnicas  de ``Deep Learning''. Sin embargo estos modelos tienen un gran inconveniente, necesitan de un conjunto excesivamente grande de datos anotados para su entrenamiento. Conseguir un gran numero de anotaciones, pude resultar un gran desafió, ya sea por la naturaliza del problema o por los grandes costo que esto conlleva. A esto se le suma la complejidad del problema en si, es decir, poder detectar todas las instancias de todos los posibles objetos en una imagen. Esto motivo a la aparición de métodos como ZSD, que intenten mitigar estas dificultades reduciendo el numero de anotaciones necesarias.\\
 
-Para poder explayar los distintos problemas de la visión por computadora, primero es necesario distinguir dos conjuntos. Por un lado, los datos de entrenamiento, que consta de las imágenes que se usan para entrenar el modelo con sus respectivas etiquetas, es decir, que objetos se encuentran en la imagen, localización de los objetos, descripción de la imagen, o cualquier información extra que requiera la tarea. Por otro lado, las imágenes de prueba, que es el conjunto donde se observará o medirá la eficiencia del modelo ya entrenado. 
+Con el objetivo de entender mejor la detección de objetos sin ejemplo, comparemos esta tarea con otras mas conocidas como la clasificación o el aprendizaje sin ejemplos. Antes de explayar los distintos problemas de la visión por computadora, es necesario distinguir dos conjuntos. Por un lado, los datos de entrenamiento, que consta de las imágenes que se usan para entrenar el modelo con sus respectivas etiquetas, es decir, que objetos se encuentran en la imagen, localización de los objetos, descripción de la imagen, o cualquier información extra que requiera la tarea. Por otro lado, las imágenes de prueba, que es el conjunto donde se observará o medirá la eficiencia del modelo ya entrenado. 
 
 Supongamos que las etiquetas solo cuenta con dos tipos de información, que clase de objeto es, es decir si es un perro, auto, persona, etc. y su localización en la imagen. A todas las clases de objetos que aparecen en los datos de entrenamiento las llamaremos clases visibles o vistas, y todas aquellas clase que no sea una clase vista las llamearemos invisible o no vista. Dicho esto, los distintos problemas son:
 
@@ -12,40 +12,27 @@ Supongamos que las etiquetas solo cuenta con dos tipos de información, que clas
 	\item \textbf{Clasificación más localización}: además de poder clasificar tiene que ser capas de ubicar el objeto en la imagen. Los datos anotados tienen que contar con la clase del objeto y su localización.
 	\item \textbf{Reconocimiento de imagen}: predice que objetos perteneciente a las clases visibles están presente en la imagen. Es necesario imágenes de entrenamiento con múltiples objetos presentes.
 	\item \textbf{La detección de objetos}: además de reconocer objetos visibles, tiene que ser capás de localizar dichos objetos. Para su entrenamiento se tiene que agregar la localización de todos los objetos. 
-	\item \textbf{Zero-shot learning}: tiene que poder reconocer clases vistas y no vistas. Esta tarea  no necesita datos extras al reconocimiento de imagen tradicional. 
-	\item \textbf{Zero-shot object detection} (\textbf{ZSD}): debe localizar y clasificar todas las instancias de objetos en la imagen, sin depender si es una clase vista o no. Necesita los mismo datos que la detección de objeto, pero no es necesario que todas las clase estén presente en el entrenamiento.
+	\item \textbf{Aprendizaje sin ejemplos}: ZSL por sus siglas en ingles \textit{Zero-shot learning}, tiene que poder reconocer clases vistas y no vistas. Esta tarea no necesita datos extras al reconocimiento de imagen tradicional. 
+	\item \textbf{Detección de objetos sin ejemplos}: ZSD por sus siglas en ingles \textit{Zero-shot object detection}, debe localizar y clasificar todas las instancias de objetos en la imagen, sin depender si es una clase vista o no. Necesita los mismo datos que la detección de objeto, pero no es necesario que todas las clase estén presente en el entrenamiento.
 \end{itemize}
-
-\begin{figure}[]
-  \centering
-  \subcaptionbox{\tiny{\textbf{Clasificación + localización}}}{\includegraphics[width=1.6in]{img/expect_3.png}}
-  \subcaptionbox{\tiny{\textbf{Detección de objetos}}}{\includegraphics[width=1.6in]{img/expect_2.png}}
-  \subcaptionbox{\tiny{\textbf{ZSD}}}{\includegraphics[width=1.6in]{img/expect_1.png}}
-  \caption{Ejemplo de tareas de clasificación más localización (a), detección de objetos (b) y ZSD (c). En la escala de los verdes se encuentran las clases vistas \{Caballo, Árbol\}, y en rojo las clases invisibles \{Perro, Persona, Campera, Pantalón, Correa\}.}
-  \label{fig:DetectoresYSZD}
-\end{figure}
 
 La \autoref{fig:DetectoresYSZD} muestra un ejemplo de los resultados esperados por las distintas tareas.\\
 
-Además de los problemas mencionados anteriormente, existen otros como la segmentación, que no desarrollaremos en este trabajo. Aquí, solo nos enfocaremos en ZSD y sus problemas asociados.
+\begin{figure}[]
+	\centering
+	\subcaptionbox{\tiny{\textbf{Clasificación + localización}}}{\includegraphics[width=1.6in]{img/expect_3.png}}
+	\subcaptionbox{\tiny{\textbf{Detección de objetos}}}{\includegraphics[width=1.6in]{img/expect_2.png}}
+	\subcaptionbox{\tiny{\textbf{ZSD}}}{\includegraphics[width=1.6in]{img/expect_1.png}}
+	\caption{Ejemplo de tareas de clasificación más localización (a), detección de objetos (b) y ZSD (c). En la escala de los verdes se encuentran las clases vistas \{Caballo, Árbol\}, y en rojo las clases invisibles \{Perro, Persona, Campera, Pantalón, Correa\}.}
+	\label{fig:DetectoresYSZD}
+\end{figure}
 
 
 \section{Historia} \label{sec:historia}
 
-Uno de los primeros trabajo que influyo en la detección de objeto fue desarrollado por dos neurofisiólogos, David Hubel y Torsten Wiesel~\cite{hubel1959receptive}, en 1959. Su publicación, titulada \textit{``Receptive fields of single neurons in the cat’s striate cortex''}, en español ``Campos receptivos de neuronas individuales en la corteza estriada del gato'', describió las propiedades de respuesta central de las neuronas corticales visuales y como la experiencia visual de un gato moldea su arquitectura cortical. Los investigadores establecieron a través de su experimentación (\autoref{fig:ExpermentoHubelTorsten}) que existen neuronas simples y complejas en la corteza visual primaria, y que el procesamiento visual siempre comienza con estructuras simples como los bordes orientados y gradualmente identifica estructuras más complejas. En la actualidad, este es el principio básico detrás del aprendizaje profundo.\\
+Para entender de donde surge la detección de objetos sin ejemplo, es necesario repasar los aportes más influyentes en la detección de objetos. 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{img/cat.jpg}
-	\caption{Simple explicación del experimento realizado por David Hubel y Torsten Wiesel}
-	\label{fig:ExpermentoHubelTorsten}
-\end{figure}
-
-Otro hecho importante en la historia de la visión por computadora fue en 1957, cuando Russell Kirsch y sus colegas desarrollaron un aparato que permitía transformar imágenes en cuadrículas de números que las máquinas de lenguaje binario podían entender. 
-
-Poco tiempo después, en la década de 1960 fue cuando la inteligencia artificial (IA) se convirtió en una disciplina académica y algunos de los investigadores eran extremadamente optimistas sobre el futuro del campo. En este período, Seymour Papert, profesor del laboratorio de IA del MIT, decidió lanzar el Proyecto de Verano y resolver, en pocos meses, el problema de la visión artificial. Los estudiantes debían diseñar una plataforma que pudiera realizar automáticamente segmentación de fondo y extraer objetos no superpuestos de imágenes del mundo real. Claro está que el proyecto no fue un éxito.  Hoy en día, sesenta años después, todavía no se ha podido resolver la visión por computadora. Sin embargo, ese proyecto fue el nacimiento oficial de esta disciplina como campo científico. 
-
-Los aportes más influyentes en este campo empezaron a surgir a partir de los años 2000. En 2001, Paul Viola y Michael Jones~\cite{viola2001rapid} presentaron el primer detector de rostros que funcionó en tiempo real. Aunque no se basaba en el aprendizaje profundo, el algoritmo tenía una relación con éste, ya que, al procesar imágenes aprendió qué características podrían ayudar a localizar caras, inspirándose en el experimento de David Hubel y Torsten Wiesel. 
+En 2001, Paul Viola y Michael Jones~\cite{viola2001rapid} presentaron el primer detector de rostros que funcionó en tiempo real. Aunque no se basaba en el aprendizaje profundo, el algoritmo tenía una relación con éste, ya que, al procesar imágenes aprendió qué características podrían ayudar a localizar caras, inspirándose en un experimento de dos neurofisiólogos David Hubel y Torsten Wiesel del 1995~\cite{hubel1959receptive}, el cual es la base de la detección actual.
 
 \begin{figure}[]
 	\centering
@@ -53,14 +40,12 @@ Los aportes más influyentes en este campo empezaron a surgir a partir de los a�
 		\centering
 		\includegraphics[width=1\textwidth]{img/evolucion_2.png}
 		\caption{Las mejoras de precisión en la detección de objetos en los conjuntos de datos VOC07 y COCO. Los detectores en esta figura son: DPM-v1~\cite{felzenszwalb2008discriminatively}, DPM-v5~\cite{sadeghi201430hz}, RCNN~\cite{girshick2014rich}, SPPNet~\cite{girshick2014rich}, Fast RCNN~\cite{he2015spatial}, Faster RCNN~\cite{ren2015faster}, SSD~\cite{liu2016ssd}, FPN~\cite{lin2017feature}, Retina-Net~\cite{lin2017focal}, RefineDet~\cite{zhang2018single}, TridentNet~\cite{li2019scale} y YOLO V4~\cite{wang2020scaled}.}
-		\label{fig:IoU}
 	\end{subfigure}
 	\centering
 	\begin{subfigure}{0.75\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{img/evolucion_1.png}
 		\caption{El creciente número de publicaciones sobre detección de objetos entre 2000 y 2020 (datos de la búsqueda avanzada de Google academico: allintitle: ``object detection'' OR ``detecting objects'').}
-		\label{fig:NMS}
 	\end{subfigure}
 	\caption{Estadísticas sobre la tarea de detección objetos. Estas imágenes están basadas en gráficos presentados en el trabajo~\cite{zou2019object}.}
 	\label{fig:evolucion}
@@ -68,12 +53,8 @@ Los aportes más influyentes en este campo empezaron a surgir a partir de los a�
 
 En 2006, comenzó la competencia de Pascal VOC que permitió evaluar el desempeño de diferentes métodos para el reconocimiento de objetos. Más tarde en 2010, siguiendo los pasos de Pascal VOC, se inició el concurso de reconocimiento visual a gran escala ImageNet (ILSVRC) cuya tasa de error durante 2010 y 2011, en el desafío de clasificación de imágenes, rondaba el 26\%.  En 2012, un equipo de la Universidad de Toronto ingresó a la competencia con un modelo de red neuronal convolucional (AlexNet)~\cite{krizhevsky2012imagenet} que cambió todo, dado que logró una tasa de error del 16,4\%. Este suceso hizo que la tasa de error en clasificación disminuyera pero también impulso a que problemas como la detección de objeto empezaran a utilizar este tipo de red y mejoraran considerablemente. En la \autoref{fig:evolucion} se muestra algunas estadísticas sobre detección de objeto y como este suceso influyo sobre estas.
 
+Todos estos modelos y competencias ayudaron a mejorando el rendimiento de la detección de objetos, pero a su ves empezaron a surgir limitaciones con los datos que se necesitan para entrenar los modelos. Por este motivo la comunidad científica empezó a analizar formas de mitigar estos problemas, dando nacimiento a la detección de objetos sin ejemplos.
 
-\section{Esfuerzos recientes en ZSD}\label{sec:esfuerzosrecientesenZSD}
-
-Existen muchas técnicas propuestas para resolver ZSD. Cuando se empezó a leer sobre este tema a fines del 2018, la más utilizada consistía en crear una combinación de aspectos visuales y semánticos de cada objeto. Puntualmente existían tres trabajos en paralelos con una metodología similar. Bansal \etal~\cite{bansal2018zero} propuso un enfoque basado en características donde las propuestas de objetos se generan mediante edge-box. Zhu \etal~\cite{zhu2018zero} propone un método basado en el detector YOLO~\cite{redmon2016you}. Rahman \etal~\cite{rahman2018zero} propuso una extensión de Faster R-CNN~\cite{ren2015faster} junto a un nuevo enfoque transductivo para asociar objetos novedosos en el espacio semántico.\\
-
-En los últimos dos años se publicaron nuevos trabajos utilizando esta técnica. Rahman \etal~\cite{rahman2020zero} que mejora los modelos y resultados de su trabajo previo~\cite{rahman2018zero}. Gupta \etal~\cite{gupta2020multi} donde combina predicciones obtenidas en dos espacios de búsqueda diferentes, es decir, del espacio semántico al visual y viceversa. Rahman \etal~\cite{rahman2020improved} proponen  una función de pérdida novedosa que maneja el desequilibrio de clases y busca alinear adecuadamente los vectores visuales y semánticos.
 
 \section{Motivación} \label{sec:motivacion}
 
@@ -82,4 +63,4 @@ Por unos minutos dejemos llevarnos por la imaginación y supongamos que se quier
 
 \section{Estructura de la tesis} \label{sec:estructuradelatesis}
 
-Esta tesis se estructura de la siguiente manera. En el~\autoref{cap:marcoteorico} se detallan los conceptos fundamentales utilizado a lo largo del trabajo. En el~\autoref{cap:metodologia} se formaliza el problema de ZSD y se define la arquitectura empleada para resolverlo. Además, se describe los conjuntos de datos utilizados para entrenar y medir el rendimiento del modelo, como así también los detalles de nuestra implementación. Por último se define las distintas métricas utilizadas y describe los distintos experimentos realizados. Luego en el~\autoref{cap:analisideresultado} se analizan los resultados obtenidos y se compara con distintos trabajos. El~\autoref{cap:conclusiones} expone las conclusiones que se obtuvieron, los aportes realizados por esta tesis, y los trabajos futuros o mejoras.
+Esta tesis se estructura de la siguiente manera. En el~\autoref{cap:marcoteorico} se detallan los conceptos fundamentales utilizado a lo largo del trabajo y se formaliza el problema de ZSD. En el~\autoref{cap:arquitecturayconjuntosdedatos} se define la arquitectura empleada para resolver este problema. Además, se describe los conjuntos de datos utilizados para entrenar y medir el rendimiento del modelo, como así también las métricas utilizadas. En el~\autoref{cap:experimentos} se describen los distintos experimentos realizados y se analizan los resultados obtenidos, los cuales se comparan con distintos trabajos. Por ultimo, en el~\autoref{cap:conclusiones} expone las conclusiones que se obtuvieron, los aportes realizados por esta tesis, y los trabajos futuros o mejoras.
