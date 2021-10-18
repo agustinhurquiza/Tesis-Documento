@@ -1,42 +1,37 @@
 \chapter{Modelado y conjuntos de datos}\label{cap:arquitecturayconjuntosdedatos}
 
-En este capítulo se detalla la solución propuesta en el trabajo para resolver ZSD, se explayan las distintas etapas, se presentan los conjuntos de datos utilizados y como se puede evaluar los modelos de ZSD Y GZSD en estos conjuntos.
+En este capítulo se detalla la metodología que se utilizó en la presente tesis para resolver ZSD. Específicamente, se explayan las distintas etapas, se presentan los conjuntos de datos utilizados y se desarrolla como puede evaluarse el rendimiento de los modelos de ZSD Y GZSD en estos conjuntos de datos.\\
 
-En la actualidad la arquitectura mas utilizado por la comunidad científica para resolver el problema de ZSD, es utilizar el espacio que forman modelos como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove} para transferir el conocimiento de las clases vistas a las inviables. Luego de analizar los distintos artículos (ver \autoref{ssec:trabajosrecientesenzsd}). Basándonos en la complejidad del modelo y sus resultados, se decidió apoyarse en el trabajo de Bansal \etal~\cite{bansal2018zero} para abordar el problema de ZSD.
-
-En las siguientes secciones se abordaran las distintas etapas y los detalles de la arquitectura.
+En la actualidad la arquitectura mas utilizado por la comunidad científica para resolver el problema de ZSD, es utilizar el espacio que forman modelos como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove} para transferir el conocimiento de las clases vistas a las inviables. Luego de analizar los distintos artículos (ver \autoref{ssec:trabajosrecientesenzsd}), y basándonos en la complejidad del modelo y sus resultados, se decidió apoyarse en el trabajo de Bansal \etal~\cite{bansal2018zero} para abordar el problema de ZSD. En las siguientes secciones se abordaran las distintas etapas y los detalles de la arquitectura.
 
 
 \section{Modelado}\label{ssec:preprocesamiento} 
-Antes de detallar el entrenamiento de la arquitectura, es necesario explayar como se modifican los datos, para poder ser utilizados.
-
-Cada dato de entrenamiento consiste de una imagen y un conjunto de cuadros delimitadores con el nombre de la clase del objeto que se encuentra dentro del cuadro. El objetivo de esta etapa es generar por cada imagen un conjunto de puntos en el espacio visual y semantico que corresponde a cada cuadro. Por un lado, se recortan los cuadros de la imagen $x_i$ y se recalan a un tamaño fijo, por ejemplo 224$\times$224. Luego se utiliza una CNN pre-entrenada como VGG16~\cite{simonyan2014very} para generar los vectores visuales de cada cuadro. La salida de este paso es:
+Antes de detallar el entrenamiento de la arquitectura, es necesario explayar como se modifican los datos, para poder ser utilizados. Cada dato de entrenamiento consiste de una imagen y un conjunto de cuadros delimitadores con el nombre de la clase del objeto que se encuentra dentro del cuadro. El objetivo de esta etapa es generar por cada imagen un conjunto de puntos en el espacio visual y semántico que corresponde a cada cuadro. Por un lado, se recortan los cuadros de la imagen $x_i$ y se recalan a un tamaño fijo, por ejemplo 224$\times$224. Luego se utiliza una CNN pre-entrenada como VGG16~\cite{simonyan2014very} para generar los vectores visuales de cada cuadro. La salida de este paso es:
 
 \[B_i = [\phi(b_0),...,\phi(b_k) \mid \phi(b_i) \in \mathbb{R}^{D_1}]\] 
 
-Donde $B_i$ son todas los vectores de caracteristicas visuales de la imagen $x_i$.
+Donde $B_i$ son todos los vectores de características visuales de la imagen $x_i$.
 
 Por otro lado, cada cuadro se asocia con el vector semántico de la clase que tiene asignado, que se puede obtener con modelos de vectores de palabras previamente entrenados, como Word2Vec~\cite{mikolov2013distributed} o GloVe~\cite{pennington2014glove}. Dando como resultado:
 
 \[W_i = [w_0,...,w_k \mid w_i \in \mathbb{R}^{D_2}]\]
 
-Con $W_i$ los vectores semánticos asociado a cada cuadro. En la \autoref{fig:arqutectura} se ejemplifica los pasos antes mencionados.
+Donde $W_i$ son los vectores semánticos asociado a cada cuadro. En la \autoref{fig:arqutectura} se ejemplifica los pasos mencionados anteriormente.\\
 
 
-\begin{figure}
+En la inferencia se quiere predecir la clase a la que pertenece cada cuadro delimitador en una imagen, para esto, se computa el vector visual $\phi(b_i)$ obtenido por una CNN como VGG16~\cite{simonyan2014very}, y luego utilizando la matriz de proyección $W_p$ (que nos permite pasar del dominio visual al semántico, ver \autoref{ssec:formalizaciondezsd}), calculamos el vector semántico asociado al vector visual. Por ultimo se calcula la similitud coseno entre el vector semántico obtenido y el de las de todas las clases que se quiere evaluar, asignándole a esa propuesta la que obtenga un mejor puntaje. La \autoref{fig:arquitectura_prueba} muestra la arquitectura empleada en la etapa de inferencia.
+
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\textwidth]{img/arquitectura.png}
-	\caption{Esquema del pre-procesamiento de las imágenes y como se obtienen los vectores semánticos y visuales.}
+	\caption{Esquema del pre-procesamiento de las imágenes y de como se obtienen los vectores semánticos y visuales.}
 	\label{fig:arqutectura}
 \end{figure}
 
-
-En la inferencia se quiere predecir la clase a la que pertenece cada cuadro delimitador en una imagen, para esto, se computa el vector visual $\phi(b_i)$ obtenido por una CNN como VGG16~\cite{simonyan2014very}, y luego utilizando la matriz de proyección $W_p$ (que nos permite pasar del dominio visual al semantico, ver \autoref{ssec:formalizaciondezsd}) calculamos el vector semantico asociado al vector visual. Por ultimo se calcula la similitud coseno entre el vector semantico obtenido y el de las de todas las clases que se quiere evaluar, asignándole a esa propuesta la que obtenga un mejor puntaje. La \autoref{fig:arquitectura_prueba} muestra la arquitectura empleada en la etapa de inferencia.
-
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\textwidth]{img/arquitectura_prueba.png}
-	\caption{Arquitectura propuesta para evaluar el modelo de ZSD, utilizando vectores semánticos y visuales.}
+	\caption{Arquitectura propuesta para inferir los vectores semánticos (por ende a la clase que pertenece un cuadro delimitador) a partir de un vector visual.}
 	\label{fig:arquitectura_prueba}
 \end{figure}
 
@@ -44,23 +39,22 @@ En la inferencia se quiere predecir la clase a la que pertenece cada cuadro deli
 
 \subsection{Función de costo}
 
-Utilizamos el espacio semantico (${R}^{D_2}$) para calcular una medida de similitud entre las proyecciones $\phi(b_j) \in X_i	$ y los vectores semánticos $w_j \in W_i$. Luego, para entrena la proyección $W_p$, que nos permite transformar un vector del espacio visual a uno del espacio semantico, definimos una función de costo, que imponga la restricción que el puntaje de la similitud de un cuadro delimitador, con su clase verdadera, debe ser más alto que el de otras clases. Por ejemplo, la proyección de un cuadro que tiene un ``perro'', tiene que estar lo mas cerca posible del vector semantico ``perro'', y a su ves lejos de cualquier otro vector semantico.
+Utilizamos el espacio semántico (${R}^{D_2}$) para calcular una medida de similitud entre las proyecciones $\phi(b_j) \in X_i	$ y los vectores semánticos $w_j \in W_i$. Luego, para entrena la proyección $W_p$, que nos permite transformar un vector del espacio visual a uno del espacio semántico, definimos una función de costo, que imponga la restricción que el puntaje de la similitud de un cuadro delimitador, con su clase verdadera, debe ser más alto que el de otras clases. Por ejemplo, la proyección de un cuadro que tiene un ``perro'', tiene que estar lo mas cerca posible del vector semántico ``perro'', y a su ves lejos de cualquier otro vector semántico como ``gato'' o ``auto''.
 
 Utilizaremos la función de costo definida como: 
 
 \[\mathcal{L}(\psi_i, w_i) = \sum_{j \in \mathcal{S}, j\neq i} max(0, m - S_{ii} + S_{ij})\] 
-donde $m$ es el margen máximo, y $S_{ij}$ es la similitud entre la proyección $i$-$esima$ y el vector semantico $j$-$esimo$. 
+donde $m$ es el margen máximo, y $S_{ij}$ es la similitud entre la proyección $i$-$esima$ y el vector semántico $j$-$esimo$. 
 
-Para comprender mejor esta función supongamos un margen máximo de 1 y que para todo $S_{ij}$ se cumple $0 < S_{ij} < 1$. Si la similitud entre la proyección y su vector semantico ($S_{ii}$) es cercano a 1, la función solo dependen de los $S_{ij}$ con $j \neq i$, mientras mas cercanos a 0 la función de costo si minimiza y mientra mas altos esta aumenta. Por otro lado, si la similitud $S_{ii}$ es aproximadamente 0, estaríamos penalizando la función sin importar los $S_{ij}$, pero si estos aumentan empeoran el resultado. \\
+Para comprender mejor esta función supongamos un margen máximo de 1, y que para todo $S_{ij}$ se cumple $0 < S_{ij} < 1$. Si la similitud entre la proyección y su vector semántico ($S_{ii}$) es cercano a 1, la función sólo dependen de los $S_{ij}$, con $j \neq i$, cuando estos valores se acercan a 0 la función de costo se minimiza, y cuando aumentan la función de costo también lo hace. Por otro lado, si la similitud $S_{ii}$ es aproximadamente 0, estaríamos penalizando la función sin importar los $S_{ij}$, pero si estos aumentan la función de costo crecerá a la par de ellos. \\
 
 
-También se agrega una función de pérdida de reconstrucción como sugieren Kodirov \etal~\cite{kodirov2017semantic}. Se utilizan las características del cuadro delimitador proyectadas para reconstruir los vectores visuales originales, y calcular la pérdida de reconstrucción como la distancia $L2$  entre el vectores reconstruido y el original.
+También se agrega una función de costo de reconstrucción ($\mathcal{L}_r$) como sugiere Kodirov \etal~\cite{kodirov2017semantic}. En esta función se utilizan las características del cuadro delimitador proyectadas para reconstruir los vectores visuales originales, y calcular la pérdida de reconstrucción como la distancia $L2$  entre el vector reconstruido y el original:
 \[\mathcal{L}_r = \Vert{\phi(b_i) - \psi_iW_p^T}\Vert^2 \] 
-Luego, definimos $\lambda$ como un coeficiente de ponderación que controla la importancia del primer y segundo término, que corresponden a las pérdidas de proyección y reconstrucción respectivamente. Por lo cual la función de perdida total es: 
+Luego, definimos $\lambda$ como un coeficiente de ponderación que controla la importancia del primer y segundo término, que corresponden a las pérdidas de proyección y reconstrucción, respectivamente. Por lo cual, la función de perdida total es: 
 \[\mathcal{L}_t = \lambda \mathcal{L} + (1-\lambda) \mathcal{L}_r \]
  
 Es común que en la detección de objetos se incluya una clase de fondo, para obtener un detector robusto que pueda discriminar eficazmente entre objetos de primer plano y objetos de fondo. En ZSD, esto no es un problema trivial, ya que no se sabe si un cuadro de fondo incluye elementos como cielo, tierra, bosque, etc. o una instancia de una clase de objeto invisible. En muchos trabajos se proponen distintas técnicas para abordar este problema, pero no presentan mejoras en evaluaciones cuantitativas. Es por esto que no se incluye una arquitectura que discrimine cuadros de fondos.
-
 
 \section{Conjuntos de datos} \label{sec:conjuntosdedatos}
 
@@ -68,7 +62,7 @@ En la actualidad no existe un conjunto de datos pensado para evaluar ZSD, es por
 
 \subsection{Common Objects in Context (COCO)}\label{ssec:commonobjectsincontext}
 
-COCO es una base de datos que tiene como objetivo ayudar en la investigación de detección de objetos, posee varias caracteristicas como segmentación de instancias, subtítulos de imágenes y localización de puntos clave de personas. Este conjunto de datos contiene 80 tipos de objetos o  clases, con un total de 2.5 millones de instancias etiquetadas en 328.000 imágenes. La \autoref{fig:ejemplo_coco} muestra algunas imágenes que forman parte del conjunto COCO.
+COCO es una base de datos que tiene como objetivo ayudar en la investigación de detección de objetos, posee varias características como segmentación de instancias, subtítulos de imágenes y localización de puntos clave de personas. Este conjunto de datos contiene 80 tipos de objetos o  clases, con un total de 2.5 millones de instancias etiquetadas en 328.000 imágenes. La \autoref{fig:ejemplo_coco} muestra algunas imágenes que forman parte del conjunto COCO.
 
 \begin{figure}
 	\begin{center}
@@ -79,9 +73,10 @@ COCO es una base de datos que tiene como objetivo ayudar en la investigación de
 	\end{center}	
 \end{figure}
 
-La gran cantidad de instancias de objetos y de categorías, resulta en un conjunto ideal para entrenar y evaluar modelos de ZSD. Además, la mayoría de la imágenes consta de una gran cantidad de objetos, a diferencia de conjuntos como Visual Genome~\cite{krishnavisualgenome}. Esto generan un contexto en el que varios objetos se relacionan y se superponen, emulando de una mejor manera situaciones de la vida real. 
+La gran cantidad de instancias de objetos y de categorías, resulta en un conjunto ideal para entrenar y evaluar modelos de ZSD. Además, la mayoría de la imágenes constan de una gran cantidad de objetos, a diferencia de conjuntos como Visual Genome~\cite{krishnavisualgenome}. Estas tipo de imágenes generan un contexto en el que varios objetos se relacionan y se superponen, emulando de una mejor manera situaciones de la vida real. 
 
 En este trabajo se utilizan las imágenes de entrenamiento del conjunto COCO 2014 e imágenes del conjunto de validación para realizar las pruebas de ZSD.
+
 \begin{figure}
 	\begin{center}
 		\centering
@@ -90,14 +85,15 @@ En este trabajo se utilizan las imágenes de entrenamiento del conjunto COCO 201
 		\label{fig:data_set}
 	\end{center}	
 \end{figure}
+/* ToDo ver bien el numerod e clases que estoy utilziando*/
 
-Como COCO no provee una separación de los datos para evaluar modelos de ZSD, es necesario crear una forma de dividir las clases en vistas e invisibles. Esta separación resulta de suma importancia, ya que se debe cumplir que para todo objeto del conjunto prueba, exista otro de aspecto similar que este presente durante el entrenamiento. Además, no se puede encontrar ningún objeto de prueba en los datos de entrenamiento. Para esto, se aprovecha de que COCO tiene agrupadas las clases por ``Clases superiores'' que agrupa varias clases que tienen alguna relacion, por ejmeplo la clase superior animales contiene las clases zebra, perro, gato, etc. Por cada uno de estos grupos se elige de forma aleatoria un 70\% de clases para entrenamiento y un 30\% para pruebas. Es decir, 47 y 18 clases respectivamente, de un total de 65 clases de COCO 2014. En la~\autoref{fig:data_set} se puede observar el resultado de esta división. Por último se eliminaron todas las imágenes de entrenamiento que contengan al menos una instancia de las clases de prueba. Esto resulta en 42564 imágenes con 261258 instancias de entrenamiento, y 3008 imágenes con 10878 instancias de prueba. 
+Como COCO no provee una separación de los datos para evaluar modelos de ZSD, es necesario crear una forma de dividir las clases en vistas e invisibles. Esta separación resulta de suma importancia, ya que se debe cumplir que para todo objeto del conjunto prueba, exista otro de aspecto similar que este presente durante el entrenamiento. Además, no se puede encontrar ningún objeto de prueba en los datos de entrenamiento. Para esto, se aprovecha que COCO tiene agrupadas las clases por ``Clases superiores'' donde se agrupan objetos que tienen alguna relación. Por ejemplo, la clase superior animales contiene las clases zebra, perro, gato, etc. Por cada uno de estos grupos se elige de forma aleatoria un 70\% de clases para entrenamiento y un 30\% para pruebas. Es decir, 47 y 18 clases, respectivamente, de un total de 65 clases de COCO 2014. En la~\autoref{fig:data_set} se puede observar el resultado de esta división. Por último, se eliminaron todas las imágenes de entrenamiento que contengan al menos una instancia de las clases de prueba. Esto resulta en 42564 imágenes, con 261258 instancias de entrenamiento, y 3008 imágenes con 10878 instancias de prueba. 
 
 Bansal \etal~\cite{bansal2018zero}, divide el conjunto de datos de manera similar, utilizando la misma cantidad de clases para las etapas de prueba y entrenamiento. Pero la diferencia radica en que utiliza los vectores densos de palabras para agrupar las clases, utilizando la  similitud coseno entre los vectores como métrica. Por último, elige de forma aleatoria las clases visibles e invisibles de cada grupo. En este trabajo también se utiliza esta separación para logra una comparación de modelos más justa.
 
 
 \subsection{CIFAR-ZSD} \label{ssec:cifarzsd}
-\begin{figure}[H]
+\begin{figure}[]
 	\begin{center}
 		\begin{subfigure}{.3\textwidth}
 			\includegraphics[width=1\textwidth]{img/cifar-zsd-test400.jpg}
@@ -116,7 +112,7 @@ Bansal \etal~\cite{bansal2018zero}, divide el conjunto de datos de manera simila
 	\end{center}
 \end{figure}
 
-COCO puede resultar pesado en término computacional. Para soluciona esto se creó un conjunto de datos sintético basado en CIFAR-100 datasets, el cual denominamos CIFAR-ZSD. Éste consta de imágenes localizadas, rotadas y re-escalada aleatoriamente con un fondo de otra imagen (algunos ejemplos se pueden ver en la \autoref{fig:CIFAR-ZSD}). Con esto se intenta simular imágenes reales en la cual un objeto puede aparecer con distintos aspectos y escalas. Este conjunto esta dividido para que ninguna instancia de prueba  aparezca en el conjunto de entrenamiento.
+COCO puede resultar pesado en término computacional. Para soluciona esto se creó un conjunto de datos sintético basado en CIFAR-100 datasets, el cual denominamos CIFAR-ZSD. Éste consta de imágenes localizadas, rotadas y re-escalada aleatoriamente con un fondo de otra imagen (algunos ejemplos se pueden ver en la \autoref{fig:CIFAR-ZSD}). Con esto se intenta simular imágenes reales en la cual un objeto puede aparecer con distintos aspectos y escalas. Este conjunto esta dividido de tal forma que ninguna instancia de prueba  aparezca en el conjunto de entrenamiento.
 
 Aunque este conjunto resulta muy útil para hacer pruebas de modelos, no es bueno para reportar métricas reales, pero en combinación con COCO, que si lo es, facilita los experimentos a realizar.
 
