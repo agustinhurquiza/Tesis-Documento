@@ -62,7 +62,7 @@ En la actualidad no existe un conjunto de datos pensado para evaluar ZSD, es por
 
 \subsection{Common Objects in Context (COCO)}\label{ssec:commonobjectsincontext}
 
-COCO es una base de datos que tiene como objetivo ayudar en la investigación de detección de objetos, posee varias características como segmentación de instancias, subtítulos de imágenes y localización de puntos clave de personas. Este conjunto de datos contiene 80 tipos de objetos o  clases, con un total de 2.5 millones de instancias etiquetadas en 328.000 imágenes. La \autoref{fig:ejemplo_coco} muestra algunas imágenes que forman parte del conjunto COCO.
+COCO es una base de datos que tiene como objetivo ayudar en la investigación de detección de objetos, posee varias características como segmentación de instancias, subtítulos de imágenes y localización de puntos clave de personas. Este conjunto de datos contiene 80 (65 para COCO 2014) tipos de objetos o  clases, con un total de 2.5 millones de instancias etiquetadas en 328.000 imágenes. La \autoref{fig:ejemplo_coco} muestra algunas imágenes que forman parte del conjunto COCO.
 
 \begin{figure}
 	\begin{center}
@@ -85,7 +85,6 @@ En este trabajo se utilizan las imágenes de entrenamiento del conjunto COCO 201
 		\label{fig:data_set}
 	\end{center}	
 \end{figure}
-/* ToDo ver bien el numerod e clases que estoy utilziando*/
 
 Como COCO no provee una separación de los datos para evaluar modelos de ZSD, es necesario crear una forma de dividir las clases en vistas e invisibles. Esta separación resulta de suma importancia, ya que se debe cumplir que para todo objeto del conjunto prueba, exista otro de aspecto similar que este presente durante el entrenamiento. Además, no se puede encontrar ningún objeto de prueba en los datos de entrenamiento. Para esto, se aprovecha que COCO tiene agrupadas las clases por ``Clases superiores'' donde se agrupan objetos que tienen alguna relación. Por ejemplo, la clase superior animales contiene las clases zebra, perro, gato, etc. Por cada uno de estos grupos se elige de forma aleatoria un 70\% de clases para entrenamiento y un 30\% para pruebas. Es decir, 47 y 18 clases, respectivamente, de un total de 65 clases de COCO 2014. En la~\autoref{fig:data_set} se puede observar el resultado de esta división. Por último, se eliminaron todas las imágenes de entrenamiento que contengan al menos una instancia de las clases de prueba. Esto resulta en 42564 imágenes, con 261258 instancias de entrenamiento, y 3008 imágenes con 10878 instancias de prueba. 
 
@@ -143,7 +142,7 @@ El trabajo de Bansal \etal~\cite{bansal2018zero}, define \textit{Recall} de la s
 	\textit{``Un cuadro delimitador predicho se marca como verdadero positivo solo si tiene una superposición de IoU mayor que un cierto umbral $t$ con un cuadro delimitador existente en la imagen y no se ha asignado ningún otro cuadro delimitador de mayor confianza al mismo cuadro. De lo contrario, se marca como falso positivo.''}\\
 \end{center}
 
-Según esta definición solo se tienen en cuenta los objetos que tuvieron al menos una propuesta con un IoU $> 0.5$, y el resto quedan fuera del cálculo de esta métrica. Esto genera una diferencia enorme entre los resultados calculados con esta definición y con los obtenidos usando la \autoref{eqn:recall}. Con el objetivo de poder comparar los resultados con otros modelos, en este trabajo se calcula \autoref{eqn:recall} de ambas formas. 
+Según esta definición solo se tienen en cuenta los objetos que tuvieron al menos una propuesta con un IoU $> 0.5$, y el resto quedan fuera del cálculo de esta métrica. Esto genera una diferencia enorme entre los resultados calculados con esta definición y con los obtenidos usando la \autoref{eqn:recall}. Con el objetivo de poder comparar los resultados con otros modelos, en este trabajo se calcula la \textit{Recall} de ambas formas. 
 
 Bansal \etal~\cite{bansal2018zero} además calcula una variación denominada \textit{K@Recall}, donde sólo se tienen en cuentan las \textit{K} mejores propuestas basándose en la confianza de la predicción y el resto son descartadas.\\
 

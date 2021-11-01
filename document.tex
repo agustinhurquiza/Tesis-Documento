@@ -101,15 +101,14 @@ oportunidad de formarme. Quiero agradecer a mi tutor Dr. Jorge Sanchez, que me g
 
 \pagestyle{plain}
 
-En el año 2010 surgió la llamada ``Revolución'' del Aprendizaje profundo, y con esto, surgieron una gran cantidad de métodos capases de detectar objetos en una imagen. Estos algoritmos o modelos fueron mejorando en cada año, hasta hoy en día, que alcanzaron un excelente rendimiento e innumerables aplicaciones. Pero estos poseen una limitación, necesitan tener una gran cantidad de imágenes anotadas que en algunos casos resulta inviable. Para resolver este problema surgieron técnicas como \textbf{Zero-shot Object Detection} (ZSD). Este es un problema de investigación recientemente propuesto, que tiene como objetivo localizar y reconocer simultáneamente objetos de clases nunca antes vistas. Generalmente se proponen modelos de ZSD como una combinación características visuales y descripciones semánticas, aprendiendo un mapeo visual-semántico de las características visuales de las imágenes a las incrustaciones semánticas de etiquetas de cada clases de objeto. Este ultimo es un espacio donde las características de lo objetos vistos son transferidos a los novedoso.
+En el año 2010 surgió la llamada ``revolución'' del aprendizaje profundo, y con esto, los métodos capaces de detectar objetos en una imagen progresaron considerablemente. Estos algoritmos o modelos fueron mejorando en cada año, hasta hoy en día, que alcanzaron un excelente rendimiento e innumerables aplicaciones. Pero estos poseen una limitación, necesitan tener una gran cantidad de imágenes anotadas, que en algunos casos resulta inviable. Para resolver este problema surgieron técnicas como la detección de objetos sin ejemplos (ZSD) por sus siglas en ingles \textit{Zero-shot Object Detection}. Este es un problema de investigación recientemente propuesto, que tiene como objetivo localizar y reconocer simultáneamente objetos de clases nunca antes vistas. Para suplir la falta de ejemplos de entrenamiento de algunas clases, se combinan distintos atributos de las imágenes y de las clases para inferir los objetos novedosos. Generalmente, se proponen modelos de ZSD como una combinación de características visuales y descripciones semánticas, aprendiendo un mapeo visual-semántico. 
 
-En este tesis, analizamos distintos trabajos y llevamos a cabo experimentos en el conjunto de datos COCO, con la idea de aportar una noción del estado actual en esta área. \\\\\\\\\\\\
+En la actualidad existen modelos que obtienen información de las descripciones semánticas capaces de asociar clases similares con una gran eficiencia, en este trabajo se utiliza esta cualidad para poder transferir el conocimiento de las clases presentes en el entrenamiento a las que no estuvieron presentes.
+
+
+En esta tesis, analizamos distintos artículos científicos y llevamos a cabo experimentos en el conjunto de datos COCO, con la idea de aportar una noción del estado actual en esta área. \\ \\ \\ \\ \\
 {\huge\textbf{Summary}}\\\\
 
-\textcolor{red}{/* ToDo: Traducir la nueva versión del Resumen. */}
-In the 2000s, the popularization of digital cameras and the increase of the Internet speed caused the rapid development of Internet images. This fact created the need of developing faster and more efficient methods to facilitate the extraction of information from these data. In 2010, with the Deep Learning ``revolution'', many different methods emerged to carry out this task, among them Detectors. These algorithms use a large number of image annotations that, in some cases, results impossible to obtain. As an alternative to solve this problem, techniques such as \textbf{Zero-shot Object Detection} emerged. 
-
-This thesis tackles this problem using deep features and semantic embedding, with the aim of detecting and recognizing novel object instances. Hence, we analyzed different works from literature and we performed experiments that provide a notion of the current state in this area.
 
 %----------------------------------------------------------------------------------------
 %	TABLA DE CONTENIDOS
