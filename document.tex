@@ -10,6 +10,7 @@
 \usepackage{float}
 \usepackage{tikz-qtree,tikz-qtree-compat}
 \usepackage{multicol}
+\usepackage{pdfpages}
 \usepackage{algpseudocode}
 \usepackage[nottoc]{tocbibind}
 \usepackage[pdftex,
@@ -43,7 +44,7 @@
 \begin{titlepage}
 \begin{center}
 
-\textsc{\Large Facultad de Matemática, Astronomía, Física y Computación}\\[2em]
+\textsc{\Large Facultad de Matemática, Astronomía, Física y Computación}\\[1em]
 
 \textsc{Universidad Nacional de Córdoba}
 
@@ -58,34 +59,28 @@
 
 \textsc{\huge \textbf{Detección de objetos en imágenes mediante aprendizaje sin ejemplos}}\\[2em]
 
-\textsc{\large Tesis}\\[1em]
+\textsc{Licenciado en Ciencias de la Computación}
 
-\textsc{ para obtener el título de}\\[1em]
+\textsc{}
 
-\textsc{Licenciado en Ciencias de la Computación}\\[1em]
-
-\textsc{}\\[1em]
-
-\textsc{\Large Agustin Horacio Urquiza Toledo}\\[1em]
+\textsc{\Large Agustin Horacio Urquiza Toledo}
 
 \textsc{\large Director: Jorge Sanchez}
 
 \end{center}
 
-\vspace*{\fill}
-\textsc{Córdoba, Argentina \hspace*{\fill} 2021}
+\begin{center}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[]{lic.png}
+\end{center}
+\end{figure}
+\textit{Detección de objetos en imágenes mediante aprendizaje sin ejemplos por Agustin Horacio Urquiza Toledo se distribuye bajo una \href{http://creativecommons.org/licenses/by-sa/4.0/}{\color{blue}Licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional.}}
+\end{center}
 
+\textsc{Córdoba, Argentina \hspace*{\fill} 2021}
 \end{titlepage}
 
-%----------------------------------------------------------------------------------------
-%	DEDICATORIA
-%----------------------------------------------------------------------------------------
-\pagestyle{empty}
-\frontmatter
-
-\begin{flushright}
-\textit{}
-\end{flushright}
 
 %----------------------------------------------------------------------------------------
 %	AGRADECIMIENTOS
@@ -106,13 +101,30 @@ En el año 2010 surgió la llamada ``revolución'' del aprendizaje profundo, y c
 En la actualidad existen modelos que obtienen información de las descripciones semánticas capaces de asociar clases similares con una gran eficiencia, en este trabajo se utiliza esta cualidad para poder transferir el conocimiento de las clases presentes en el entrenamiento a las que no estuvieron presentes.
 
 
-En esta tesis, analizamos distintos artículos científicos y llevamos a cabo experimentos en el conjunto de datos COCO, con la idea de aportar una noción del estado actual en esta área. \\ \\ \\ \\ \\
-{\huge\textbf{Summary}}\\\\
+En esta tesis, analizamos distintos artículos científicos y llevamos a cabo experimentos en el conjunto de datos COCO, con la idea de aportar una noción del estado actual en esta área.
+
+\section*{Palabras claves}
+Detección de objetos en imágenes mediante aprendizaje sin ejemplos, aprendizaje automático sin ejemplos, aprendizaje profundo, deep learning, zero-shot learning, zero-shot object detection.\\
+
+\section*{Sistema de clasificación} 
+
+Detección de objetos.
+
+\chapter*{Summary}
+
 In 2010 the deep learning revolution started and made possible the development of methods that are able to detect objects contained in images. These algorithms were improved with the years, and nowadays, they have achieved excellent performance and a great number of applications. However, these methods still have some limitations, mostly related to the great number of tagged images that need to be considered, which in some cases are impossible to obtain. In order to solve this problem, several techniques have been developed, such as the zero shoot detection (ZSD). This method has been recently proposed and aims to simultaneously localize and recognize objects of unseen classes. In order to compensate for the lack of ``examples of training'' of some classes, different attributes of the images and the classes are combined to infer the new objects. In general, ZSD models are designed as a combination of visual characteristics and semantic descriptions, which make it possible to learn a visual-semantic mapping.
 
 Today, there are models that obtain information from semantic descriptions, and are able to associate similar classes in a very efficient way. This property is used in present work to transfer the knowledge of the classes seen during the training to the ones that were not present in it.
 
 This thesis analyzes different scientific articles and presents experiments that were carried out within the data set COCO, with the objective of contributing to the current knowledge in this field. 
+
+\section*{Keywords}
+Deep learning, zero-shot learning, zero-shot object detection.
+
+\section*{Computing Classification System} 
+
+Object detection.
+
 
 %----------------------------------------------------------------------------------------
 %	TABLA DE CONTENIDOS
@@ -149,5 +161,8 @@ This thesis analyzes different scientific articles and presents experiments that
 \nocite{*}
 \bibliographystyle{ieeetr}
 \bibliography{bibliografia.bib} % Aquí ponen el nombre del archivo .bib
+
+
+\includepdf[pages=-]{firmas_del_tribunal.pdf}
 
 \end{document}
